@@ -1,0 +1,192 @@
+id: mastyf-ai
+name: Mastyf AI Security Platform
+description: >
+  Open-source AI security platform providing perimeter defense for LLMs and AI
+  agents through swarm analysis, policy enforcement, adversarial testing, and
+  real-time threat detection. Scans MCP server configurations for
+  vulnerabilities, detects prompt injection, enforces access policies, and
+  provides compliance reporting across SOC2, HIPAA, PCI-DSS, FedRAMP, and
+  ISO27001 frameworks. Includes autonomous red teaming, honeypot deployment,
+  supply chain verification, and agent-to-agent trust negotiation.
+author:
+  name: Mastyf AI
+  github: mastyf-ai
+repository: https://github.com/mastyf-ai/mastyf.ai
+transport:
+  - stdio
+category: Security
+tags:
+  - ai-security
+  - mcp-security
+  - vulnerability-scanning
+  - prompt-injection
+  - compliance
+  - red-teaming
+  - policy-enforcement
+  - supply-chain
+created_at: "2025-01-01T00:00:00.000Z"
+updated_at: "2026-07-06T00:00:00.000Z"
+tools:
+  - name: scan_security
+    description: >
+      Scan MCP server configurations for security vulnerabilities including
+      CVEs, authentication issues, typo-squatting, and secrets exposure.
+    input_schema:
+      type: object
+      properties:
+        configPath:
+          type: string
+          description: Path to an MCP config file. If omitted, auto-discovers configs.
+  - name: audit_costs
+    description: Audit token usage and estimate costs per MCP server.
+    input_schema:
+      type: object
+      properties:
+        serverName:
+          type: string
+          description: Filter to a specific server name. If omitted, audits all.
+  - name: check_health
+    description: Check health, latency, and reliability of MCP servers.
+    input_schema:
+      type: object
+      properties:
+        serverName:
+          type: string
+          description: Filter to a specific server name. If omitted, checks all.
+  - name: full_report
+    description: Generate a complete security, cost, and health report for all MCP servers.
+    input_schema:
+      type: object
+      properties:
+        configPath:
+          type: string
+          description: Path to MCP config file (optional)
+        format:
+          type: string
+          enum:
+            - json
+            - markdown
+            - text
+          description: "Output format (default: text)"
+  - name: scan_prompt_injection
+    description: "Scan tool call arguments for prompt injection payloads targeting downstream AI agents."
+    input_schema:
+      type: object
+      properties:
+        toolName:
+          type: string
+          description: Tool name being called
+        serverName:
+          type: string
+          description: Server name
+        arguments:
+          type: object
+          description: Tool call arguments to scan
+      required:
+        - toolName
+        - arguments
+  - name: run_self_assessment
+    description: Run a full autonomous red team assessment with attack generation and policy testing.
+    input_schema:
+      type: object
+      properties:
+        attackCount:
+          type: number
+          description: "Number of attacks to generate (default: 50)"
+  - name: deploy_honeypot
+    description: Deploy an ephemeral decoy MCP server to detect adversarial probing.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Honeypot display name
+        template:
+          type: string
+          enum:
+            - decoy-production-database
+            - decoy-filesystem
+            - decoy-github
+            - decoy-slack
+            - decoy-api-server
+            - decoy-credentials-vault
+            - decoy-admin-panel
+          description: Decoy template
+        ttlMinutes:
+          type: number
+          description: "Auto-destroy after N minutes (default: 30)"
+        alertOnInteraction:
+          type: boolean
+          description: "Alert on every probe (default: true)"
+      required:
+        - name
+        - template
+  - name: verify_supply_chain
+    description: Full supply chain integrity verification with signed attestation for MCP server packages.
+    input_schema:
+      type: object
+      properties:
+        packageName:
+          type: string
+          description: MCP server package name to verify
+        version:
+          type: string
+          description: Package version (optional)
+      required:
+        - packageName
+  - name: generate_compliance_evidence
+    description: Generate auditor-ready compliance evidence bundle for a framework.
+    input_schema:
+      type: object
+      properties:
+        framework:
+          type: string
+          enum:
+            - soc2
+            - hipaa
+            - pci-dss
+            - fedramp
+            - iso27001
+          description: Compliance framework
+      required:
+        - framework
+  - name: compute_trust_score
+    description: Compute an A+-F trust score for an MCP server across 8 security dimensions.
+    input_schema:
+      type: object
+      properties:
+        serverName:
+          type: string
+          description: Server name to score
+        cveCount:
+          type: number
+          description: Number of known CVEs
+        maxCvss:
+          type: number
+          description: Maximum CVSS score
+        authMethod:
+          type: string
+          enum:
+            - none
+            - api_key
+            - oauth2
+            - oauth2_mtls
+          description: Authentication method
+        transport:
+          type: string
+          enum:
+            - stdio
+            - http
+            - https
+            - mTLS
+          description: Transport protocol
+install:
+  command: npx
+  args:
+    - "@mastyf_ai/server"
+env_vars:
+  - name: MASTYF_API_KEY
+    description: API key for Mastyf AI platform
+    required: false
+license: AGPL-3.0
+version: "4.1.12"
