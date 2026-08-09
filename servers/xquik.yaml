@@ -1,0 +1,58 @@
+id: xquik
+name: Xquik MCP Server
+description: >
+  Remote MCP server for Xquik's X data platform. Provides API exploration and
+  authenticated Xquik API calls for X post search, user lookup, extraction,
+  account and keyword monitoring, webhook setup, and related X data workflows.
+  Use it when an agent needs documented Xquik capabilities through MCP without
+  handling X credentials or session material in chat.
+author:
+  name: Xquik
+  github: Xquik-dev
+repository: https://github.com/Xquik-dev/x-twitter-scraper
+transport:
+  - http-streaming
+category: Research
+tags:
+  - x
+  - twitter
+  - social-data
+  - research
+  - monitoring
+  - webhooks
+  - mcp
+created_at: "2026-06-13T00:04:00.000Z"
+updated_at: "2026-06-13T00:04:00.000Z"
+tools:
+  - name: explore
+    description: Search the Xquik API catalog and inspect documented endpoint capabilities.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search query for Xquik API capabilities.
+      required:
+        - query
+  - name: xquik
+    description: Run authenticated Xquik API calls through the remote MCP server.
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Xquik API path to call.
+        method:
+          type: string
+          description: HTTP method for the request.
+        body:
+          type: object
+          description: Optional JSON body for write or setup requests.
+      required:
+        - path
+env_vars:
+  - name: XQUIK_API_KEY
+    description: Xquik API key for authenticated MCP requests.
+    required: true
+license: MIT
+version: "2.4.16"

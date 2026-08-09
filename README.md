@@ -6,7 +6,7 @@ A community-maintained registry of MCP (Model Context Protocol) servers — stru
 
 | Metric | Count |
 |--------|-------|
-| Servers | 51 |
+| Servers | 52 |
 | Categories | 11 |
 | Transport types | 3 (stdio, sse, http-streaming) |
 
@@ -204,6 +204,7 @@ updated_at: "2026-05-21T00:00:00.000Z"
 | [Vercel](servers/vercel.yaml) | DevOps | Vercel | stdio, http-streaming |
 | [VSCode](servers/vscode.yaml) | Development | acomagu | stdio |
 | [Xcode](servers/xcode.yaml) | Development | Apple | stdio |
+| [Xquik](servers/xquik.yaml) | Research | Xquik | http-streaming |
 | [AWS](servers/aws.yaml) | Cloud | AWS Labs | stdio |
 | [Anthropic](servers/anthropic.yaml) | AI | Anthropic | stdio |
 | [ChromaDB](servers/chromadb.yaml) | Database | Chroma | stdio |
