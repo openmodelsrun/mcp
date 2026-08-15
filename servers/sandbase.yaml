@@ -1,0 +1,35 @@
+id: sandbase
+name: SandBase
+description: >
+  An open-source MCP CLI that connects Claude Code, Codex, Cursor, Windsurf,
+  Claude Desktop, and other AI clients to 2,000+ AI models. SandBase
+  provides discovery, schema and pricing inspection, synchronous and
+  asynchronous execution, run history, and account tools through one MCP
+  connection without requiring users to configure separate provider API keys.
+author:
+  name: SandBase
+  github: sandbaseai
+repository: https://github.com/sandbaseai/cli
+transport:
+  - stdio
+category: AI
+tags:
+  - ai-models
+  - api-gateway
+  - developer-tools
+  - mcp
+  - model-access
+created_at: "2026-08-15T00:00:00.000Z"
+updated_at: "2026-08-15T00:00:00.000Z"
+install:
+  npm: "@sandbaseai/cli"
+  command: npx
+  args:
+    - "-y"
+    - "@sandbaseai/cli"
+    - mcp-bridge
+    - "--client"
+    - claude-desktop
+license: Apache-2.0
+version: "0.1.14"
+stars: 1
