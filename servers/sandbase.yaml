@@ -2,7 +2,7 @@ id: sandbase
 name: SandBase
 description: >
   An open-source MCP CLI that connects Claude Code, Codex, Cursor, Windsurf,
-  Claude Desktop, and other AI clients to 2,000+ AI models and APIs. SandBase
+  Claude Desktop, and other AI clients to 2,000+ AI models. SandBase
   provides discovery, schema and pricing inspection, synchronous and
   asynchronous execution, run history, and account tools through one MCP
   connection without requiring users to configure separate provider API keys.
