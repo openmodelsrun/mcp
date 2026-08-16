@@ -1,0 +1,101 @@
+id: mainbook
+name: MainBook Bank Statement Converter
+description: >
+  Converts a PDF bank or credit-card statement into structured transactions and returns
+  them as Excel, CSV, or JSON. Every conversion is re-added by the service — opening balance
+  plus credits minus debits against the printed closing balance — and rows that could not be
+  read confidently are flagged instead of guessed, so an agent can report what is verified and
+  what still needs a human. Credit-card statements are handled without inventing a per-row
+  running balance that such statements do not carry. Use it for bookkeeping, accountant
+  handovers, loan or tax paperwork, or any task that needs statement data in a spreadsheet.
+  Conversion spends the account's page credits (one page, one credit); checking the balance,
+  listing jobs and fetching a finished job are free.
+author:
+  name: Human Beyond LLC
+  github: human-beyond
+repository: https://github.com/human-beyond/mainbook-mcp
+transport:
+  - stdio
+  - http-streaming
+category: Productivity
+tags:
+  - bank-statements
+  - pdf
+  - excel
+  - csv
+  - accounting
+  - bookkeeping
+  - finance
+  - data-extraction
+created_at: "2026-08-16T00:00:00.000Z"
+updated_at: "2026-08-16T00:00:00.000Z"
+tools:
+  - name: convert_bank_statement
+    description: >
+      Convert one PDF bank or credit-card statement end to end and return the transactions
+      with a validation verdict. Spends page credits — one page, one credit.
+    input_schema:
+      type: object
+      properties:
+        file_path:
+          type: string
+          description: Absolute path to a local PDF, within the folders the server is allowed to read
+        file_url:
+          type: string
+          description: Public HTTPS URL of the PDF, used instead of file_path
+        output_format:
+          type: string
+          description: "xlsx, csv, or json"
+      required: []
+  - name: get_conversion
+    description: >
+      Get the current state of one conversion by job_id, including transactions and the
+      validation verdict once it has finished. Free to call.
+    input_schema:
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: Identifier returned by convert_bank_statement
+      required:
+        - job_id
+  - name: list_conversions
+    description: List one page of conversion jobs belonging to the account. Free to call.
+    input_schema:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Cursor returned by a previous call, to continue the list
+      required: []
+  - name: get_balance
+    description: >
+      Return total, reserved and available MainBook credits, measured in PDF pages.
+      Free to call, and worth calling before a conversion.
+    input_schema:
+      type: object
+      properties: {}
+      required: []
+  - name: output_folder
+    description: >
+      Read or change the folder where XLSX and CSV results are written. Local (stdio) mode only.
+    input_schema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: An allowed absolute folder, or 'next_to_source' to restore the default
+      required: []
+install:
+  command: uvx
+  args:
+    - mainbook-mcp
+    - "~/Downloads"
+    - "~/Desktop"
+    - "~/Documents"
+env_vars:
+  - name: MAINBOOK_API_KEY
+    description: MainBook API key, created at https://mainbook.ai/developer
+    required: true
+license: MIT
+version: "0.4.2"
