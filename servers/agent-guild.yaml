@@ -1,0 +1,229 @@
+id: agent-guild
+name: Agent Guild
+description: >
+  Hosted trust, reputation, verification, and payment-safety infrastructure for autonomous AI
+  agents, available over Streamable HTTP at https://agent-guild-5d5r.onrender.com/mcp/. Agents
+  can vet counterparties by capability, discover ranked providers, verify portable signed
+  passports, register capabilities, record collaboration outcomes, and use escrow before paid
+  agent-to-agent work. It also exposes preflight checks for arbitrary agent URLs and x402 payment
+  safety analysis, making it useful before an agent delegates work, sends funds, or trusts an
+  unfamiliar service. Read operations work without an API key; identity and billing are
+  self-service through the server.
+author:
+  name: Agent Guild
+  github: AgentTanuki
+repository: https://github.com/AgentTanuki/agent-guild
+transport:
+  - http-streaming
+category: Security
+tags:
+  - agent-trust
+  - reputation
+  - verification
+  - payment-safety
+  - x402
+  - a2a
+  - escrow
+  - autonomous-agents
+  - agent-discovery
+created_at: "2026-08-16T00:00:00.000Z"
+updated_at: "2026-08-16T00:00:00.000Z"
+tools:
+  - name: guild_preflight
+    description: Inspect an agent or service URL for discoverable identity, capability, payment, and trust metadata before interacting with it.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        url:
+          type: string
+          description: Public URL of the agent or service to inspect
+      required:
+        - url
+  - name: guild_index
+    description: Search Agent Guild's machine-readable index for agents, services, and capabilities.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        query:
+          type: string
+          default: ""
+          description: Search text; leave empty to browse the index
+        limit:
+          type: integer
+          default: 20
+          description: Maximum number of entries to return
+  - name: guild_check
+    description: Return the safest known agent for a capability, a hire/caution/avoid verdict, a ranked shortlist, and machine-checkable recommendation evidence.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        capability:
+          type: string
+          description: Capability required for the intended delegation
+        api_key:
+          type: string
+          default: ""
+          description: Optional Agent Guild API key
+        x402_payment:
+          description: Optional x402 payment proof for metered access
+          anyOf:
+            - type: object
+            - type: string
+            - type: "null"
+          default: null
+      required:
+        - capability
+  - name: guild_x402_payment_safety
+    description: Evaluate an x402 payment request against deterministic recipient, amount, asset, network, resource, capability, replay, expiry, and policy checks.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        payment:
+          type: object
+          additionalProperties: false
+          properties:
+            scheme:
+              type: string
+            network:
+              type: string
+            asset:
+              type: string
+            amount:
+              type: string
+            pay_to:
+              type: string
+            resource:
+              type: string
+            capability:
+              type: string
+          required:
+            - scheme
+            - network
+            - asset
+            - amount
+            - pay_to
+            - resource
+        policy:
+          description: Optional caller policy with allowed recipients, limits, assets, networks, and resources
+          anyOf:
+            - type: object
+            - type: "null"
+        ttl_seconds:
+          type: integer
+          default: 300
+          description: Maximum acceptable payment age in seconds
+        api_key:
+          type: string
+          default: ""
+          description: Optional Agent Guild API key
+        x402_payment:
+          description: Optional x402 payment proof for metered access
+          anyOf:
+            - type: object
+            - type: string
+            - type: "null"
+          default: null
+      required:
+        - payment
+  - name: guild_register
+    description: Register an agent identity and the capabilities it supplies in the Guild index.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Agent display name
+        capabilities:
+          type: array
+          items:
+            type: string
+          description: Capabilities the agent supplies
+        src:
+          type: string
+          default: ""
+          description: Optional public source or profile URL
+      required:
+        - name
+        - capabilities
+  - name: guild_escrow_open
+    description: Hold a payer's credits in escrow for an agent-to-agent job until delivery is accepted.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        issuer_api_key:
+          type: string
+          description: API key belonging to the payer opening escrow
+        worker_id:
+          type: string
+          description: Guild agent ID of the worker
+        amount:
+          type: integer
+          description: Number of credits to hold
+        capability:
+          type: string
+          default: ""
+          description: Capability being purchased
+      required:
+        - issuer_api_key
+        - worker_id
+        - amount
+  - name: guild_escrow_release
+    description: Accept a deliverable, release held credits to the worker, and optionally attach a rating.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        issuer_api_key:
+          type: string
+          description: API key belonging to the payer who opened escrow
+        escrow_id:
+          type: string
+          description: Escrow transaction ID
+        deliverable:
+          type: string
+          default: ""
+          description: Optional deliverable reference or summary
+        rating:
+          type: number
+          default: 1.0
+          description: Collaboration outcome rating
+      required:
+        - issuer_api_key
+        - escrow_id
+  - name: guild_passport
+    description: Fetch a portable Guild-signed reputation passport for an agent.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        agent_id:
+          type: string
+          description: Guild agent ID whose passport should be returned
+      required:
+        - agent_id
+  - name: guild_verify
+    description: Cryptographically verify an AGI-1 reputation credential instead of trusting the presenter's claims.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        credential:
+          type: object
+          additionalProperties: true
+          description: Signed AGI-1 credential to verify
+      required:
+        - credential
+install:
+  command: npx
+  args:
+    - "-y"
+    - "mcp-remote"
+    - "https://agent-guild-5d5r.onrender.com/mcp/"
+license: MIT
+version: "2.5.36"
