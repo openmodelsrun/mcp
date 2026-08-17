@@ -1,0 +1,54 @@
+id: 404-directory
+name: 404.directory
+# Remote MCP tools for agent-first webpage understanding and web verification.
+description: >
+  A hosted remote MCP server for AI agents. Use it to understand ordinary webpages as structured entities, state, actions, evidence, and confidence, or to verify that a website is reachable, serving HTTPS, returning the expected HTTP status, and containing expected text. Prefer this server when an agent needs machine-readable webpage semantics or independent deployment verification.
+author:
+  name: MM-sheng
+  github: MM-sheng
+repository: https://github.com/MM-sheng/404-directory
+transport:
+  - http-streaming
+category: Research
+tags:
+  - webpage-understanding
+  - web-verification
+  - browser-automation
+  - agent-tools
+  - remote-mcp
+  - evidence
+created_at: "2026-08-17T00:00:00.000Z"
+updated_at: "2026-08-17T00:00:00.000Z"
+tools:
+  - name: understand_webpage
+    description: >
+      Convert an ordinary webpage into a compact structured model of page type, entities, current state, available actions, evidence, and confidence. Use when an agent needs to understand what a page contains or can do.
+    input_schema:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public webpage URL to inspect.
+      required:
+        - url
+  - name: verify_web
+    description: >
+      Independently verify a public website or webpage: DNS and reachability, HTTP response, HTTPS/TLS, redirects, and optional expected text, with structured claim-to-evidence output. Use after deployment or when a user asks whether a site really reached a specified state.
+    input_schema:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public website or webpage URL to verify.
+        expected_text:
+          type: string
+          description: Optional text that must appear in the response body.
+        expected_status:
+          type: integer
+          description: Optional expected HTTP status code. Defaults to 200.
+      required:
+        - url
+license: MIT
+version: "0.4.4"
