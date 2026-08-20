@@ -1,0 +1,80 @@
+id: admapix
+name: AdMapix MCP Server
+description: >
+  Search competitor advertising creatives through the AdMapix API and return raw
+  structured records. The search_creatives tool supports keyword, date, market,
+  category, pagination, and sorting filters for agent-driven ad research.
+author:
+  name: AdMapix
+  github: fly0pants
+repository: https://github.com/fly0pants/admapix
+transport:
+  - stdio
+category: Research
+tags:
+  - advertising
+  - ad-intelligence
+  - competitor-analysis
+  - creative-research
+  - market-research
+  - data-search
+  - app-analytics
+  - python
+  - api
+  - mcp
+created_at: "2026-08-21T00:00:00.000Z"
+updated_at: "2026-08-21T00:00:00.000Z"
+tools:
+  - name: search_creatives
+    description: Search AdMapix advertising creatives and return raw structured data.
+    input_schema:
+      type: object
+      properties:
+        keyword:
+          type: string
+          description: Keyword to search for in advertising creatives.
+        creative_team:
+          type: array
+          items:
+            type: string
+          description: Optional creative team filters.
+        start_date:
+          type: string
+          description: Optional inclusive start date for the search range.
+        end_date:
+          type: string
+          description: Optional inclusive end date for the search range.
+        page:
+          type: integer
+          description: Page number, starting at 1.
+        page_size:
+          type: integer
+          description: Number of records per page, from 1 to 60.
+        sort_field:
+          type: string
+          description: Sort field identifier supported by the AdMapix API.
+        sort_rule:
+          type: string
+          description: Sort direction, asc or desc.
+        country_ids:
+          type: array
+          items:
+            type: string
+          description: Optional country or market identifiers.
+        trade_level1:
+          type: array
+          items:
+            type: string
+          description: Optional top-level industry category filters.
+install:
+  command: uvx
+  args:
+    - "--from"
+    - "admapix-mcp"
+    - "admapix-mcp"
+env_vars:
+  - name: ADMAPIX_API_KEY
+    description: AdMapix API key used to authenticate creative searches.
+    required: true
+license: MIT
+version: "1.0.0"
