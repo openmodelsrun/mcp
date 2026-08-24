@@ -1,0 +1,168 @@
+id: xrocket-exchange
+name: xRocket Exchange MCP
+description: >
+  Unofficial open-source MCP server for xRocket Exchange. The hosted Streamable HTTP endpoint
+  provides live public spot symbols, tickers, order books, trades, candles, rates, fees, and a
+  combined market snapshot without credentials. The local stdio profile adds account reads and
+  autonomous market or limit orders across all available spot pairs inside one operator-set daily
+  value limit denominated in USD or another asset. Orders and cancellations do not require
+  per-order approval inside that limit; internal transfers and external withdrawals remain
+  separate explicit-approval operations. API credentials stay on the user's machine.
+author:
+  name: nakazanie-ton
+  github: nakazanie-ton
+repository: https://github.com/nakazanie-ton/myrocket
+transport:
+  - stdio
+  - http-streaming
+category: AI
+tags:
+  - xrocket
+  - crypto-exchange
+  - spot-trading
+  - autonomous-agents
+  - market-data
+  - trading
+  - testnet
+created_at: "2026-08-07T06:15:51.000Z"
+updated_at: "2026-08-24T18:50:11.000Z"
+tools:
+  - name: xrocket_market_snapshot
+    description: >
+      Resolve an exact symbol or base asset and return market rules, ticker, best bid and ask,
+      recent trades, and fees in one read-only call. Exact symbols win and ambiguous assets are
+      never guessed.
+    input_schema:
+      type: object
+      properties:
+        market:
+          type: string
+          description: Exact symbol such as GRAM-USDT, or a base asset such as GRAM
+        depth:
+          type: integer
+          enum: [5, 10, 20, 50, 100]
+          default: 20
+        precision:
+          type: string
+          description: Exact positive decimal string supported by the selected pair
+      required:
+        - market
+  - name: xrocket_market_symbols
+    description: List all exchange symbols or inspect one exact symbol and its trading constraints.
+    input_schema:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Exact current xRocket symbol, for example GRAM-USDT
+  - name: xrocket_account_overview
+    description: >
+      Read funding balances, trading balances, and active orders together without inventing a
+      portfolio valuation. Available only in a local authenticated profile.
+    input_schema:
+      type: object
+      properties: {}
+  - name: xrocket_agent_policy
+    description: Read the configured daily trading value, usage, remaining value, and order limits.
+    input_schema:
+      type: object
+      properties: {}
+  - name: xrocket_agent_trade
+    description: >
+      Place one market or limit spot order immediately when it fits the configured autonomous
+      daily value and built-in order-count limits. No per-order approval is required, and an
+      unknown write outcome is never retried.
+    input_schema:
+      type: object
+      properties:
+        order:
+          oneOf:
+            - type: object
+              properties:
+                symbol:
+                  type: string
+                side:
+                  type: string
+                  enum: [buy, sell]
+                type:
+                  type: string
+                  const: limit
+                size:
+                  type: string
+                  description: Exact positive decimal string
+                price:
+                  type: string
+                  description: Exact positive decimal string
+                timeInForce:
+                  type: string
+                  enum: [GTC, IOC, FOK]
+              required: [symbol, side, type, size, price, timeInForce]
+            - type: object
+              properties:
+                symbol:
+                  type: string
+                side:
+                  type: string
+                  enum: [buy, sell]
+                type:
+                  type: string
+                  const: market
+                size:
+                  type: string
+                  description: Exact positive base-asset quantity; use either size or funds
+                funds:
+                  type: string
+                  description: Exact positive quote-asset value; use either funds or size
+                timeInForce:
+                  type: string
+                  enum: [IOC, FOK]
+              required: [symbol, side, type, timeInForce]
+      required:
+        - order
+  - name: xrocket_agent_cancel
+    description: >
+      Cancel an order directly inside the autonomous trading scope without per-order approval.
+    input_schema:
+      type: object
+      properties:
+        cancellation:
+          type: object
+          properties:
+            orderId:
+              type: string
+            clientOrderId:
+              type: string
+          anyOf:
+            - required: [orderId]
+            - required: [clientOrderId]
+      required:
+        - cancellation
+  - name: xrocket_onboarding_links
+    description: >
+      Return xRocket sign-in links, the testnet-first local autonomous trading setup, and canonical
+      API documentation without accepting credentials.
+    input_schema:
+      type: object
+      properties: {}
+install:
+  npm: xrocket-mcp
+  command: npx
+  args:
+    - "-y"
+    - "xrocket-mcp@0.6.0"
+env_vars:
+  - name: XROCKET_API_TOKEN
+    description: Required locally for account reads and trading; never paste it into a prompt
+    required: false
+  - name: XROCKET_PROFILE
+    description: Set to full to expose autonomous trading tools
+    required: false
+  - name: XROCKET_ENVIRONMENT
+    description: Use testnet for initial validation or mainnet for live execution
+    required: false
+  - name: XROCKET_TRADING_LIMIT
+    description: One daily autonomous trading value such as 100 USD or 2.5 TONCOIN
+    required: false
+license: MIT
+version: "0.6.0"
+stars: 0
