@@ -1,0 +1,127 @@
+id: palisade-dmarc-agent
+name: Palisade DMARC Agent
+description: >
+  Official Palisade MCP server for managing email authentication from AI agents.
+  Use it to inspect and manage domains, DMARC, SPF, DKIM, BIMI, MTA-STS, DNS
+  setup records, remediation tasks, groups, and account billing. It supports a
+  hosted Streamable HTTP endpoint with a Palisade bearer API key, plus a local
+  npm bridge for stdio-only MCP clients.
+
+author:
+  name: Palisade
+  github: palisadeemail
+
+repository: https://github.com/palisadeemail/palisade-mcp
+
+transport:
+  - stdio
+  - http-streaming
+
+category: Security
+
+tags:
+  - dmarc
+  - email-authentication
+  - email-security
+  - spf
+  - dkim
+  - bimi
+  - mta-sts
+  - dns
+  - domain-management
+  - security
+
+created_at: "2026-08-15T00:00:00.000Z"
+updated_at: "2026-08-15T00:00:00.000Z"
+
+tools:
+  - name: get_account
+    description: Retrieve the authenticated Palisade account details.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: list_domains
+    description: List domains managed by the authenticated Palisade account.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_domain
+    description: Retrieve email-authentication status and details for a domain.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: add_domain
+    description: Add a domain to Palisade for email-authentication management.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: remove_domain
+    description: Remove a managed domain from Palisade.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: verify_domain
+    description: Verify a managed domain after its required DNS records are published.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_dns_records
+    description: Get the DNS records Palisade recommends for a managed domain.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_mta_sts
+    description: Retrieve MTA-STS configuration and status for a managed domain.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: enable_mta_sts
+    description: Enable MTA-STS for a managed domain.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: list_tasks
+    description: List email-authentication remediation tasks.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_task
+    description: Get the details and remediation guidance for a specific task.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: list_groups
+    description: List Palisade groups available to the authenticated account.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_subscription
+    description: Retrieve the current Palisade subscription details.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: start_checkout
+    description: Create a Stripe-hosted checkout session for a Palisade subscription.
+    input_schema:
+      type: object
+      additionalProperties: true
+  - name: get_billing_portal_url
+    description: Get a Stripe-hosted billing portal URL for the account.
+    input_schema:
+      type: object
+      additionalProperties: true
+
+install:
+  npm: "@palisadeemail/mcp"
+  command: npx
+  args:
+    - "-y"
+    - "@palisadeemail/mcp"
+
+env_vars:
+  - name: PALISADE_API_KEY
+    description: Palisade API key used to authenticate the MCP connection.
+    required: true
+
+license: MIT
+version: "0.1.2"
