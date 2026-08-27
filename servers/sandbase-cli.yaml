@@ -1,0 +1,96 @@
+id: sandbase-cli
+name: SandBase CLI
+description: >
+  Open-source CLI and local MCP bridge that connects 25 AI clients, including Claude Code,
+  Cursor, Codex, ChatGPT, Hermes, and OpenClaw, to 2,000+ AI models and APIs through one
+  authenticated interface. Its six MCP tools let agents discover endpoints, inspect schemas
+  and pricing, execute synchronous or asynchronous model and API calls, retrieve run results,
+  review recent usage, and check account balance without managing separate provider API keys.
+author:
+  name: SandBase AI
+  github: sandbaseai
+repository: https://github.com/sandbaseai/cli
+transport:
+  - stdio
+  - http-streaming
+category: AI
+tags:
+  - ai-models
+  - model-context-protocol
+  - model-routing
+  - multimodal-ai
+  - developer-tools
+  - api-gateway
+  - cli
+  - agents
+created_at: "2026-08-28T00:00:00.000Z"
+updated_at: "2026-08-28T00:00:00.000Z"
+tools:
+  - name: sandbase_discover
+    description: Search more than 2,000 AI models and API endpoints by query, type, or vendor.
+    input_schema:
+      type: object
+      properties:
+        q:
+          type: string
+          description: Search terms for the desired model or API capability.
+        type:
+          type: string
+          description: Optional endpoint type such as llm, api, multimodal, or embedding.
+        vendor:
+          type: string
+          description: Optional provider slug such as openai, anthropic, or twitter.
+        limit:
+          type: integer
+          description: Maximum number of matching endpoints to return.
+  - name: sandbase_inspect
+    description: Return an endpoint's input schema, current pricing, and executable request template.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Exact SandBase endpoint name to inspect.
+      required:
+        - name
+  - name: sandbase_run
+    description: Execute a selected AI model or API endpoint with schema-validated arguments.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Exact SandBase endpoint name to execute.
+        arguments:
+          type: object
+          description: Endpoint-specific arguments obtained from sandbase_inspect.
+      required:
+        - name
+        - arguments
+  - name: sandbase_run_get
+    description: Retrieve the current status and result of an asynchronous SandBase run.
+    input_schema:
+      type: object
+      properties:
+        run_id:
+          type: string
+          description: Run identifier returned by sandbase_run.
+      required:
+        - run_id
+  - name: sandbase_runs
+    description: List recent SandBase API calls and their recorded costs.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: Maximum number of recent runs to return.
+  - name: sandbase_account
+    description: Return the authenticated SandBase account balance and currency without charge.
+    input_schema:
+      type: object
+      properties: {}
+env_vars: []
+license: Apache-2.0
+version: "0.1.17"
+stars: 61
