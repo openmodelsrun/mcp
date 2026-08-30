@@ -1,0 +1,111 @@
+id: sandbase-harness
+name: SandBase Harness
+description: >
+  Self-hosted runtime and stdio MCP bridge for running AI agents with managed sessions,
+  sandboxed execution, MCP toolsets, credential handling, approvals, artifacts, and
+  audit-friendly session state. Use it when an agent needs a local-first control plane
+  for creating, running, inspecting, and stopping reproducible sessions.
+author:
+  name: SandBase AI
+  github: sandbaseai
+repository: https://github.com/sandbaseai/sandbase-harness
+transport:
+  - stdio
+category: Development
+tags:
+  - agents
+  - mcp
+  - sandbox
+  - self-hosted
+  - agent-runtime
+  - session-management
+  - audit
+created_at: "2026-08-30T00:00:00.000Z"
+updated_at: "2026-08-30T00:00:00.000Z"
+tools:
+  - name: list_agents
+    description: List agents available in the connected SandBase managed-agents runtime.
+    input_schema:
+      type: object
+      properties: {}
+  - name: create_session
+    description: Create a SandBase managed-agents session for an agent.
+    input_schema:
+      type: object
+      properties:
+        agent:
+          type: string
+          description: Agent id, for example agent_assistant
+        environment_id:
+          type: string
+          description: Optional environment id
+        title:
+          type: string
+          description: Optional session title
+      required:
+        - agent
+  - name: run_session
+    description: Send a message to a session and wait until its streamed turn becomes idle.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Session id
+        message:
+          type: string
+          description: User message to run
+      required:
+        - session_id
+        - message
+  - name: get_session
+    description: Get the current state and usage of a managed-agents session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Session id
+      required:
+        - session_id
+  - name: list_artifacts
+    description: List artifacts produced by a managed-agents session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Session id
+      required:
+        - session_id
+  - name: stop_session
+    description: Stop a running managed-agents session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Session id
+      required:
+        - session_id
+install:
+  command: docker
+  args:
+    - run
+    - -i
+    - --rm
+    - -e
+    - MANAGED_AGENTS_URL
+    - -e
+    - MANAGED_AGENTS_API_KEY
+    - ghcr.io/sandbaseai/sandbase-harness-mcp:0.3.8
+env_vars:
+  - name: MANAGED_AGENTS_URL
+    description: URL of the SandBase Harness runtime API.
+    required: true
+  - name: MANAGED_AGENTS_API_KEY
+    description: API key when the connected Harness runtime requires authentication.
+    required: false
+license: Apache-2.0
+version: "0.3.8"
+stars: 637
