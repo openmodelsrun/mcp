@@ -1,0 +1,34 @@
+id: magic-hour
+name: Magic Hour MCP Server
+description: >
+  Official hosted MCP server for Magic Hour (https://magichour.ai). It gives AI agents 44
+  tools for generating and editing video, images, and audio, including image-to-video,
+  text-to-video, face swap, lip sync, talking photos, image editing, background removal,
+  voice generation, and voice cloning. Tool discovery is public; generation calls require
+  a Magic Hour API key. Connect over Streamable HTTP at https://mcp.magichour.ai/.
+author:
+  name: Magic Hour
+  github: magichourhq
+repository: https://github.com/magichourhq/magic-hour-mcp
+transport:
+  - http-streaming
+category: AI
+tags:
+  - magic-hour
+  - ai-video
+  - image-generation
+  - video-generation
+  - audio-generation
+  - media-generation
+  - video-editing
+  - image-editing
+  - remote-mcp
+  - oauth
+created_at: "2026-08-30T00:00:00.000Z"
+updated_at: "2026-08-30T00:00:00.000Z"
+env_vars:
+  - name: MAGIC_HOUR_API_KEY
+    description: Magic Hour API key used to authenticate generation and editing calls
+    required: true
+version: "0.1.0"
+stars: 2
