@@ -1,0 +1,190 @@
+id: maeve-social
+name: Maeve Social MCP
+description: >
+  Maeve Social provides a hosted OAuth-secured MCP server for social media
+  operations. It lets agents discover workspaces and connected accounts,
+  inspect publishing capabilities, create and update drafts, schedule or
+  publish content, organize Media Room assets, manage task-board work and inbox
+  auto-reply rules, and read analytics. Use it when an agent needs to plan,
+  organize, schedule, publish, or measure social content across Instagram,
+  Facebook, TikTok, YouTube, LinkedIn, X, Threads, Pinterest, and Google
+  Business Profile.
+author:
+  name: Jared James
+  github: jared-james
+repository: https://github.com/jared-james/maeve-agent
+transport:
+  - http-streaming
+category: Productivity
+tags:
+  - social-media
+  - content-scheduling
+  - content-planning
+  - publishing
+  - analytics
+  - media-management
+  - task-management
+  - workflow-automation
+  - oauth
+created_at: "2026-04-28T01:06:18.000Z"
+updated_at: "2026-08-25T04:38:32.000Z"
+tools:
+  - name: list_workspaces
+    description: List the Maeve workspaces available to the authenticated user.
+    input_schema:
+      type: object
+      properties: {}
+  - name: list_integrations
+    description: List connected social accounts and their safe connection metadata for a workspace.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+      required:
+        - workspaceId
+  - name: get_integration_capabilities
+    description: Get safe publishing capabilities and requirements for one connected social account.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        integrationId:
+          type: string
+          description: Maeve integration ID.
+      required:
+        - workspaceId
+        - integrationId
+  - name: list_content
+    description: List sanitized content records for a workspace with optional status and integration filters.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        integrationId:
+          type: string
+          description: Optional connected social account ID.
+        status:
+          type: string
+          enum: [draft, scheduled, sent, failed]
+        limit:
+          type: integer
+          description: Page size from 1 to 100.
+        offset:
+          type: integer
+          description: Pagination offset.
+      required:
+        - workspaceId
+  - name: create_draft_content
+    description: Create social content as a Maeve draft without scheduling or publishing it.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        integrationId:
+          type: string
+          description: Connected social account ID.
+        captions:
+          type: object
+          description: Canonical caption and optional platform overrides.
+        internalTitle:
+          type: string
+          description: Optional internal title that is never published.
+        postType:
+          type: string
+          enum: [post, reel, story, thread, poll]
+        contentMedia:
+          type: array
+          description: Ordered Maeve Media Room assets to attach.
+          items:
+            type: object
+      required:
+        - workspaceId
+        - integrationId
+  - name: schedule_content
+    description: Schedule or reschedule an existing draft with an ISO 8601 publish time.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        contentId:
+          type: string
+          description: Draft or scheduled content ID.
+        scheduledAt:
+          type: string
+          description: ISO 8601 publish time, preferably including an explicit timezone.
+      required:
+        - workspaceId
+        - contentId
+        - scheduledAt
+  - name: publish_now
+    description: Queue an existing Maeve content item for immediate publishing after explicit confirmation.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        contentId:
+          type: string
+          description: Draft or scheduled content ID.
+        confirmationText:
+          type: string
+          description: Exact confirmation text in the form publish_now:contentId.
+      required:
+        - workspaceId
+        - contentId
+  - name: list_media
+    description: List safe Media Room asset metadata with folder, label, type, and usage filters.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        folderId:
+          type: string
+          description: Optional Media Room folder ID.
+        type:
+          type: string
+          enum: [image, video, gif]
+        search:
+          type: string
+          description: Optional filename search.
+        limit:
+          type: integer
+          description: Page size from 1 to 100.
+      required:
+        - workspaceId
+  - name: get_analytics_summary
+    description: Read sanitized aggregate social analytics without generating reports or files.
+    input_schema:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: Maeve workspace ID.
+        days:
+          description: Analytics window from 1 to 90 days, or all.
+        integrationIds:
+          type: array
+          items:
+            type: string
+          description: Optional connected social account IDs to include.
+      required:
+        - workspaceId
+env_vars:
+  - name: MAEVE_API_KEY
+    description: Optional API key fallback when the MCP client cannot use browser authentication.
+    required: false
+license: MIT
+version: "0.7.3"
