@@ -5,6 +5,17 @@ All notable changes to the OpenModels MCP Server Registry will be documented in 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-09-01
+### Added
+- Five source-backed AWS Labs MCP servers with safe read-only defaults where supported:
+  - `aws-bedrock-kb-retrieval` for cited Bedrock Knowledge Base discovery and retrieval.
+  - `aws-bedrock-agentcore` for AgentCore runtime, memory, identity, gateway, policy, browser, interpreter, and docs operations.
+  - `aws-serverless` for SAM, Lambda, event-schema, observability, and serverless lifecycle workflows.
+  - `aws-dataprocessing` for Glue, EMR, EMR Serverless, Athena, S3, and supporting IAM discovery.
+  - `aws-s3-tables` for S3 Tables and Iceberg metadata, namespaces, schemas, and read-only SQL.
+### Changed
+- Total MCP servers: 213 (from 208).
+
 ## [1.10.0] - 2026-08-27
 ### Added
 - `modelscope` — ModelScope's official server for model, dataset, Studio, paper, and MCP discovery plus supported image-generation workflows. The entry uses the published `uvx modelscope-mcp-server` stdio installation and also records the server's self-hosted HTTP/SSE transports.

@@ -1,0 +1,63 @@
+id: aws-s3-tables
+name: AWS S3 Tables MCP Server
+description: >
+  Official AWS Labs MCP server for discovering, querying, and managing Apache
+  Iceberg tables in Amazon S3 Tables. It supports table buckets, namespaces,
+  schemas, read-only SQL, metadata, and CSV or Parquet import. It starts in
+  read-only mode; writes require the explicit --allow-write flag.
+author:
+  name: AWS Labs
+  github: awslabs
+repository: https://github.com/awslabs/mcp/tree/main/src/s3-tables-mcp-server
+transport: [stdio]
+category: Database
+tags: [aws, s3, iceberg, tables, sql, lakehouse, analytics]
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-01T00:00:00.000Z"
+tools:
+  - name: list_table_buckets
+    description: List S3 Table Buckets available in the selected region.
+    input_schema:
+      type: object
+      properties:
+        region_name: {type: string, description: Optional AWS region override}
+  - name: list_namespaces
+    description: List namespaces across accessible S3 Table Buckets.
+    input_schema:
+      type: object
+      properties:
+        region_name: {type: string, description: Optional AWS region override}
+  - name: list_tables
+    description: List tables and their namespace metadata.
+    input_schema:
+      type: object
+      properties:
+        region_name: {type: string, description: Optional AWS region override}
+  - name: query_database
+    description: Run a read-only SQL query against S3 Tables.
+    input_schema:
+      type: object
+      properties:
+        query: {type: string, description: SQL query to execute}
+        region_name: {type: string, description: Optional AWS region override}
+      required: [query]
+  - name: get_table_metadata_location
+    description: Return the metadata location for a selected S3 Table.
+    input_schema:
+      type: object
+      properties:
+        table_bucket_arn: {type: string, description: ARN of the table bucket}
+        namespace: {type: string, description: Table namespace}
+        table_name: {type: string, description: Table name}
+      required: [table_bucket_arn, namespace, table_name]
+install:
+  command: uvx
+  args: ["awslabs.s3-tables-mcp-server@latest"]
+env_vars:
+  - name: AWS_PROFILE
+    description: Optional AWS CLI profile with S3 Tables access
+    required: false
+  - name: AWS_REGION
+    description: Default AWS region
+    required: false
+license: Apache-2.0

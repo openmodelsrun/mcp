@@ -6,7 +6,7 @@ A community-maintained registry of MCP (Model Context Protocol) servers — stru
 
 | Metric | Count |
 |--------|-------|
-| Servers | 208 |
+| Servers | 213 |
 | Categories | 11 |
 | Transport types | 3 (stdio, sse, http-streaming) |
 
@@ -88,7 +88,7 @@ mcp/
 ├── CHANGELOG.md             # Version history
 ├── LICENSE                  # MIT
 ├── README.md                # This file
-└── VERSION                  # Current version (1.9.0)
+└── VERSION                  # Current version (1.11.0)
 ```
 
 ## Quick Start

@@ -1,0 +1,55 @@
+id: aws-bedrock-kb-retrieval
+name: Amazon Bedrock Knowledge Base Retrieval MCP Server
+description: >
+  Official AWS Labs MCP server for discovering and querying Amazon Bedrock Knowledge
+  Bases. It returns retrieved passages with citations, supports data-source filters,
+  and can optionally rerank results. The default configuration uses local AWS
+  credentials and keeps reranking disabled unless explicitly enabled.
+author:
+  name: AWS Labs
+  github: awslabs
+repository: https://github.com/awslabs/mcp/tree/main/src/bedrock-kb-retrieval-mcp-server
+transport: [stdio]
+category: AI
+tags: [aws, bedrock, rag, knowledge-base, retrieval, citations]
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-01T00:00:00.000Z"
+tools:
+  - name: ListKnowledgeBases
+    description: Discover tagged Bedrock Knowledge Bases and their available data sources.
+    input_schema:
+      type: object
+      properties: {}
+  - name: QueryKnowledgeBases
+    description: Retrieve cited passages from one or more Bedrock Knowledge Bases with optional filtering and reranking.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Natural-language retrieval query
+        knowledge_base_id:
+          type: string
+          description: Knowledge Base identifier to query
+        reranking:
+          type: boolean
+          description: Override the server default for Bedrock reranking
+      required: [query]
+install:
+  command: uvx
+  args: ["awslabs.bedrock-kb-retrieval-mcp-server@latest"]
+env_vars:
+  - name: AWS_PROFILE
+    description: AWS CLI profile with least-privilege Bedrock Knowledge Base access
+    required: false
+  - name: AWS_REGION
+    description: AWS region containing the Knowledge Bases
+    required: false
+  - name: KB_INCLUSION_TAG_KEY
+    description: Optional tag key used to restrict discoverable Knowledge Bases
+    required: false
+  - name: BEDROCK_KB_RERANKING_ENABLED
+    description: Enables Bedrock reranking by default when set to true
+    required: false
+license: Apache-2.0
+

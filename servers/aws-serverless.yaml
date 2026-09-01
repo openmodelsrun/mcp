@@ -1,0 +1,64 @@
+id: aws-serverless
+name: AWS Serverless MCP Server
+description: >
+  Official AWS Labs MCP server for the AWS serverless application lifecycle. It
+  provides SAM initialization, builds, local invocation, deployment, logs, event
+  schemas, architecture guidance, and troubleshooting. The registry configuration
+  intentionally omits the write and sensitive-data flags, leaving those capabilities
+  disabled until a user explicitly opts in.
+author:
+  name: AWS Labs
+  github: awslabs
+repository: https://github.com/awslabs/mcp/tree/main/src/aws-serverless-mcp-server
+transport: [stdio]
+category: Cloud
+tags: [aws, serverless, lambda, sam, cloudformation, observability]
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-01T00:00:00.000Z"
+tools:
+  - name: sam_init
+    description: Initialize an AWS SAM application with a selected runtime and template.
+    input_schema:
+      type: object
+      properties:
+        project_name: {type: string, description: Name of the SAM project}
+        runtime: {type: string, description: Lambda runtime}
+        project_directory: {type: string, description: Absolute destination directory}
+        dependency_manager: {type: string, description: Runtime dependency manager}
+      required: [project_name, runtime, project_directory, dependency_manager]
+  - name: sam_build
+    description: Build a SAM application and prepare deployment artifacts.
+    input_schema:
+      type: object
+      properties:
+        project_directory: {type: string, description: Absolute SAM project directory}
+        use_container: {type: boolean, description: Build inside a container}
+      required: [project_directory]
+  - name: sam_local_invoke
+    description: Invoke a Lambda function locally through AWS SAM CLI.
+    input_schema:
+      type: object
+      properties:
+        project_directory: {type: string, description: Absolute SAM project directory}
+        resource_name: {type: string, description: Lambda logical resource name}
+      required: [project_directory, resource_name]
+  - name: get_lambda_event_schemas
+    description: Retrieve language-specific Lambda event schemas for supported event sources.
+    input_schema:
+      type: object
+      properties:
+        event_source: {type: string, description: Event source such as s3, sqs, or api-gw}
+        runtime: {type: string, description: Target language or runtime}
+      required: [event_source, runtime]
+install:
+  command: uvx
+  args: ["awslabs.aws-serverless-mcp-server@latest"]
+env_vars:
+  - name: AWS_PROFILE
+    description: Optional AWS CLI profile
+    required: false
+  - name: AWS_REGION
+    description: AWS region used by serverless tools
+    required: false
+license: Apache-2.0
+

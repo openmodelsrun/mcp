@@ -1,0 +1,67 @@
+id: aws-bedrock-agentcore
+name: AWS Bedrock AgentCore MCP Server
+description: >
+  Official AWS Labs operational MCP server for Amazon Bedrock AgentCore. It exposes
+  tools for runtimes, memory, identity, gateways, policy, managed browser sessions,
+  code interpreter sessions, and AgentCore documentation. Some calls create billable
+  resources or mutate infrastructure, so clients should use scoped IAM credentials and
+  keep only the required primitive groups enabled.
+author:
+  name: AWS Labs
+  github: awslabs
+repository: https://github.com/awslabs/mcp/tree/main/src/amazon-bedrock-agentcore-mcp-server
+transport: [stdio]
+category: AI
+tags: [aws, bedrock, agentcore, agents, memory, gateway, browser]
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-01T00:00:00.000Z"
+tools:
+  - name: create_agent_runtime
+    description: Create and configure an AgentCore runtime.
+    input_schema:
+      type: object
+      properties:
+        name: {type: string, description: Runtime name}
+        role_arn: {type: string, description: Execution role ARN}
+      required: [name]
+  - name: memory_retrieve_records
+    description: Retrieve semantically relevant records from AgentCore Memory.
+    input_schema:
+      type: object
+      properties:
+        memory_id: {type: string, description: AgentCore Memory identifier}
+        query: {type: string, description: Semantic retrieval query}
+      required: [memory_id, query]
+  - name: gateway_target_create
+    description: Add a Lambda, OpenAPI, Smithy, or MCP target to an AgentCore Gateway.
+    input_schema:
+      type: object
+      properties:
+        gateway_id: {type: string, description: AgentCore Gateway identifier}
+        name: {type: string, description: Target name}
+      required: [gateway_id, name]
+  - name: search_agentcore_docs
+    description: Search official AgentCore documentation with ranked snippets.
+    input_schema:
+      type: object
+      properties:
+        query: {type: string, description: Documentation search query}
+      required: [query]
+install:
+  command: uvx
+  args: ["awslabs.amazon-bedrock-agentcore-mcp-server@latest"]
+env_vars:
+  - name: AWS_PROFILE
+    description: Optional AWS CLI profile used by AgentCore API calls
+    required: false
+  - name: AWS_REGION
+    description: AWS region for AgentCore resources
+    required: false
+  - name: AGENTCORE_ENABLE_TOOLS
+    description: Optional comma-separated allowlist of primitive groups to register
+    required: false
+  - name: AGENTCORE_DISABLE_TOOLS
+    description: Optional comma-separated list of primitive groups to disable
+    required: false
+license: Apache-2.0
+

@@ -1,0 +1,65 @@
+id: aws-dataprocessing
+name: AWS Data Processing MCP Server
+description: >
+  Official AWS Labs MCP server for discovery and management across AWS Glue, EMR,
+  EMR Serverless, Athena, S3, and supporting IAM roles. Read operations work by
+  default; resource mutations require the explicit --allow-write flag, which is not
+  included in this registry configuration.
+author:
+  name: AWS Labs
+  github: awslabs
+repository: https://github.com/awslabs/mcp/tree/main/src/aws-dataprocessing-mcp-server
+transport: [stdio]
+category: Cloud
+tags: [aws, glue, emr, athena, data-processing, etl, analytics]
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-01T00:00:00.000Z"
+tools:
+  - name: manage_aws_glue_databases
+    description: List, inspect, create, update, or delete AWS Glue Data Catalog databases subject to server permissions.
+    input_schema:
+      type: object
+      properties:
+        operation: {type: string, description: Glue database operation}
+        database_name: {type: string, description: Glue database name}
+      required: [operation]
+  - name: manage_aws_glue_tables
+    description: Search and manage Glue Data Catalog tables.
+    input_schema:
+      type: object
+      properties:
+        operation: {type: string, description: Glue table operation}
+        database_name: {type: string, description: Glue database name}
+        table_name: {type: string, description: Glue table name}
+      required: [operation]
+  - name: manage_aws_emr_serverless_job_runs
+    description: List and inspect EMR Serverless job runs; start or cancel only when write access is enabled.
+    input_schema:
+      type: object
+      properties:
+        operation: {type: string, description: Job-run operation}
+        application_id: {type: string, description: EMR Serverless application identifier}
+      required: [operation]
+  - name: manage_aws_athena_query_executions
+    description: Inspect Athena query executions and results; query start and stop require write access.
+    input_schema:
+      type: object
+      properties:
+        operation: {type: string, description: Athena query-execution operation}
+        query_execution_id: {type: string, description: Existing query execution identifier}
+      required: [operation]
+install:
+  command: uvx
+  args: ["awslabs.aws-dataprocessing-mcp-server@latest"]
+env_vars:
+  - name: AWS_PROFILE
+    description: Optional AWS CLI profile
+    required: false
+  - name: AWS_REGION
+    description: Region for Glue, EMR, Athena, and S3 operations
+    required: false
+  - name: FASTMCP_LOG_LEVEL
+    description: FastMCP logging level
+    required: false
+license: Apache-2.0
+
