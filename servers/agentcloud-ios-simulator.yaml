@@ -1,0 +1,28 @@
+id: agentcloud-ios-simulator
+name: AgentCloud Hosted iOS Simulator
+description: >
+  A hosted Streamable HTTP MCP server for building, installing, launching, and
+  inspecting iOS applications in disposable cloud Simulators. AgentCloud exposes
+  28 tools for UI automation, accessibility inspection, device and application
+  logs, screenshots, recordings, and repeatable pull request verification.
+  Connect to https://api.agentcloud.so/mcp using an OAuth-capable MCP client;
+  OAuth 2.0 Dynamic Client Registration is supported.
+author:
+  name: AgentCloud
+  github: Theo-
+repository: https://github.com/Theo-/agentcloud-mcp
+transport:
+  - http-streaming
+category: Development
+tags:
+  - ios
+  - simulator
+  - mobile-testing
+  - ui-automation
+  - xcode
+  - cloud-development
+created_at: "2026-08-25T00:00:00.000Z"
+updated_at: "2026-08-25T00:00:00.000Z"
+license: MIT
+version: "0.1.0"
+stars: 0
