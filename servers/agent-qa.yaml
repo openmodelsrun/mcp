@@ -1,0 +1,88 @@
+id: agent-qa
+name: Agent QA
+description: >
+  Vostride's local, trusted MCP server for Agent QA. It lets agents inspect
+  configuration and schemas, author and validate natural-language web and
+  mobile test definitions, enqueue tests and suites through the local
+  dashboard, inspect run evidence, and classify failures.
+author:
+  name: Vostride
+  github: vostride
+repository: https://github.com/vostride/agent-qa
+transport:
+  - stdio
+category: Browser Automation
+tags:
+  - testing
+  - qa
+  - browser-automation
+  - mobile-testing
+  - agentic-testing
+created_at: "2026-08-16T00:00:00.000Z"
+updated_at: "2026-08-16T00:00:00.000Z"
+tools:
+  - name: agent_qa_discover
+    description: Return structured metadata for Agent QA MCP tools, resources, prompts, and current rollout scope.
+    input_schema:
+      type: object
+      properties: {}
+  - name: agent_qa_validate_definition
+    description: Validate config, test, suite, or hooks objects with Agent QA's core schemas.
+    input_schema:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [config, test, suite, hooks]
+        definition: {}
+      required: [kind, definition]
+  - name: agent_qa_list_tests
+    description: List tests through the local dashboard API using dashboard workspace discovery.
+    input_schema:
+      type: object
+      properties:
+        dashboardUrl:
+          type: string
+          format: uri
+  - name: agent_qa_enqueue_test_run
+    description: Queue a test run through the local dashboard and return the canonical run ID.
+    input_schema:
+      type: object
+      properties:
+        dashboardUrl:
+          type: string
+          format: uri
+        file:
+          type: string
+        patterns:
+          type: array
+          items:
+            type: string
+        noCache:
+          type: boolean
+        noMemory:
+          type: boolean
+        local:
+          type: boolean
+  - name: agent_qa_classify_failure
+    description: Classify a failed run from dashboard run detail, artifacts, logs, execution logs, and recent related runs.
+    input_schema:
+      type: object
+      properties:
+        dashboardUrl:
+          type: string
+          format: uri
+        runId:
+          type: string
+      required: [runId]
+install:
+  npm: agent-qa
+  command: npx
+  args:
+    - "-y"
+    - agent-qa
+    - mcp
+env_vars: []
+license: FSL-1.1-ALv2
+version: "0.1.21"
+stars: 845

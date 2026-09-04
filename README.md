@@ -167,6 +167,7 @@ the complete 207-server registry.
 
 | Server | Category | Author | Transport |
 |--------|----------|--------|-----------|
+| [Agent QA](servers/agent-qa.yaml) | Browser Automation | Vostride | stdio |
 | [ArXiv](servers/arxiv.yaml) | Research | Joe Blazick | stdio, http-streaming |
 | [AWS Docs](servers/aws-docs.yaml) | Development | AWS Labs | stdio |
 | [Brave Search](servers/brave-search.yaml) | Research | Brave | stdio |
