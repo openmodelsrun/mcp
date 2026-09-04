@@ -1,0 +1,108 @@
+id: sandbase-harness
+name: SandBase Harness MCP Server
+description: >
+  SandBase Harness MCP bridge for managing agents and durable sessions through a
+  self-hosted Harness runtime. It exposes tools to list agents, create and run
+  sessions, inspect session state, list artifacts, and stop sessions. The bridge
+  communicates over stdio and connects to a running Harness API supplied by the
+  user; execution isolation depends on the selected backend and deployment
+  configuration.
+author:
+  name: SandBase AI
+  github: sandbaseai
+repository: https://github.com/sandbaseai/sandbase-harness
+transport:
+  - stdio
+category: Development
+tags:
+  - agent-runtime
+  - mcp
+  - sessions
+  - sandbox
+  - self-hosted
+  - audit
+created_at: "2026-08-31T00:00:00.000Z"
+updated_at: "2026-08-31T00:00:00.000Z"
+tools:
+  - name: list_agents
+    description: List agents available from the configured Harness runtime.
+    input_schema:
+      type: object
+      properties: {}
+  - name: create_session
+    description: Create a durable agent session in the configured Harness runtime.
+    input_schema:
+      type: object
+      properties:
+        agent_id:
+          type: string
+          description: Identifier of the agent that owns the session.
+        input:
+          type: string
+          description: Initial session input.
+      required:
+        - agent_id
+  - name: run_session
+    description: Run or resume a durable session and return its result.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Identifier of the session to run.
+        input:
+          type: string
+          description: Input to send to the session.
+      required:
+        - session_id
+  - name: get_session
+    description: Retrieve the current state and metadata of a durable session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Identifier of the session to inspect.
+      required:
+        - session_id
+  - name: list_artifacts
+    description: List artifacts associated with a durable agent session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Identifier of the session whose artifacts should be listed.
+      required:
+        - session_id
+  - name: stop_session
+    description: Stop a running durable agent session.
+    input_schema:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: Identifier of the session to stop.
+      required:
+        - session_id
+install:
+  command: docker
+  args:
+    - run
+    - --rm
+    - -i
+    - -e
+    - MANAGED_AGENTS_URL
+    - -e
+    - MANAGED_AGENTS_API_KEY
+    - ghcr.io/sandbaseai/sandbase-harness-mcp:0.3.8
+env_vars:
+  - name: MANAGED_AGENTS_URL
+    description: URL of the running self-hosted Harness API.
+    required: true
+  - name: MANAGED_AGENTS_API_KEY
+    description: API key for the Harness API when authentication is enabled.
+    required: false
+license: Apache-2.0
+version: "0.3.8"
+stars: 640
