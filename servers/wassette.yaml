@@ -1,0 +1,20 @@
+id: wassette
+name: Wassette MCP Runtime
+description: >
+  Microsoft's Wassette is a security-oriented MCP runtime for loading and running
+  WebAssembly Components as reusable agent tools. It uses the Wasmtime sandbox to
+  isolate tools, making it useful for teams that want MCP extensibility with a
+  stronger execution boundary than ordinary local scripts.
+author: {name: Microsoft, github: microsoft}
+repository: https://github.com/microsoft/wassette
+transport: [stdio]
+category: Security
+tags: [mcp, wasm, webassembly, sandbox, security, tool-runtime]
+created_at: "2026-09-04T00:00:00.000Z"
+updated_at: "2026-09-04T00:00:00.000Z"
+install:
+  command: wassette
+  args:
+    - serve
+license: MIT
+stars: 941

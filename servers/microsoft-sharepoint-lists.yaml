@@ -1,0 +1,22 @@
+id: microsoft-sharepoint-lists
+name: Microsoft SharePoint Lists MCP Server
+description: >
+  Microsoft's remote SharePoint Lists MCP server provides Microsoft Graph-backed
+  tools for SharePoint sites, document libraries, lists, and collaboration
+  workflows. Use it for agents that need structured SharePoint list access
+  without building a custom Graph integration first.
+author: {name: Microsoft, github: microsoft}
+repository: https://github.com/bap-microsoft/MCP-Platform
+transport: [http-streaming]
+category: Productivity
+tags: [microsoft-365, sharepoint, lists, graph, collaboration, productivity]
+created_at: "2026-09-04T00:00:00.000Z"
+updated_at: "2026-09-04T00:00:00.000Z"
+install:
+  type: remote
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/{tenant_id}/servers/mcp_SharePointListsTools
+env_vars:
+  - name: MICROSOFT_TENANT_ID
+    description: Microsoft Entra tenant ID used to resolve the tenant-scoped remote MCP endpoint
+    required: true
+license: MIT

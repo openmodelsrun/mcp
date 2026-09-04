@@ -5,6 +5,16 @@ All notable changes to the OpenModels MCP Server Registry will be documented in 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-09-04
+### Added
+- Four source-backed MCP server entries:
+  - `microsoft-365-copilot-chat` for tenant-scoped Microsoft 365 search and Copilot chat workflows.
+  - `microsoft-onedrive-sharepoint` for OneDrive and SharePoint file discovery and workflow access.
+  - `microsoft-sharepoint-lists` for Microsoft Graph-backed SharePoint sites, libraries, and lists.
+  - `wassette` for sandboxed WebAssembly Component tools through Microsoft's MCP runtime.
+### Changed
+- Total MCP servers: 217 (from 213).
+
 ## [1.11.0] - 2026-09-01
 ### Added
 - Five source-backed AWS Labs MCP servers with safe read-only defaults where supported:

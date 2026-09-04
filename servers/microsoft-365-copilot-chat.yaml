@@ -1,0 +1,22 @@
+id: microsoft-365-copilot-chat
+name: Microsoft 365 Copilot Chat MCP Server
+description: >
+  Microsoft's remote MCP server for searching across Microsoft 365 content including
+  documents, emails, sites, files, and chats. It provides tools for starting and
+  maintaining rich chat conversations against Microsoft Graph-backed organizational
+  content, using the tenant-scoped Agent365 MCP endpoint.
+author: {name: Microsoft, github: microsoft}
+repository: https://github.com/bap-microsoft/MCP-Platform
+transport: [http-streaming]
+category: Productivity
+tags: [microsoft-365, copilot, graph, enterprise-search, productivity, chat]
+created_at: "2026-09-04T00:00:00.000Z"
+updated_at: "2026-09-04T00:00:00.000Z"
+install:
+  type: remote
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/{tenant_id}/servers/mcp_M365Copilot
+env_vars:
+  - name: MICROSOFT_TENANT_ID
+    description: Microsoft Entra tenant ID used to resolve the tenant-scoped remote MCP endpoint
+    required: true
+license: MIT
