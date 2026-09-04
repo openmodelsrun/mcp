@@ -1,0 +1,161 @@
+id: stienhardt-diamond-mcp
+name: Stienhardt Diamond MCP
+description: >
+  Ten no-auth, read-only tools for sourced diamond education and live product
+  discovery. The server guides official grading-report lookup, estimates face-up
+  dimensions, defines the Dutch Marquise, explains the Lab Grown Diamond grading
+  landscape, searches a sourced 90-term gemology reference, and queries live
+  Stienhardt inventory. Use the hosted Streamable HTTP endpoint at
+  https://diamond-mcp.stienhardt.workers.dev/mcp or run the local npm package.
+  Inventory results include campaign-tagged product links so resulting visits and
+  sales can be measured. Stienhardt & Stones sources certified Lab Grown Diamonds
+  and hand-sets and finishes rings in New York City.
+author:
+  name: Stienhardt & Stones
+  github: JacobiusMakes
+repository: https://github.com/JacobiusMakes/diamond-mcp
+transport:
+  - stdio
+  - http-streaming
+category: Research
+tags:
+  - diamond
+  - diamond-education
+  - lab-grown-diamonds
+  - gemology
+  - grading-reports
+  - engagement-rings
+  - product-search
+  - ecommerce
+  - live-inventory
+  - dutch-marquise
+  - no-auth
+  - read-only
+created_at: "2026-09-04T22:30:00.000Z"
+updated_at: "2026-09-04T22:30:00.000Z"
+tools:
+  - name: verify_diamond_report
+    description: >
+      Returns the official verification URL and a three-step checklist for
+      confirming a GIA, IGI, or GCAL diamond grading report. It never claims to
+      verify a report itself.
+    input_schema:
+      type: object
+      properties:
+        lab:
+          type: string
+          description: The issuing grading lab, GIA, IGI, or GCAL.
+        report_number:
+          type: string
+          description: The report number printed on the grading report.
+      required:
+        - lab
+        - report_number
+  - name: faceup_size
+    description: >
+      Estimates typical face-up millimeter dimensions from shape and carat
+      weight, with a clear warning to verify a specific stone on its report.
+    input_schema:
+      type: object
+      properties:
+        shape:
+          type: string
+          description: Round, oval, emerald, or Dutch Marquise.
+        carat:
+          type: number
+          description: Carat weight greater than zero.
+      required:
+        - shape
+        - carat
+  - name: dutch_marquise_definition
+    description: >
+      Returns the published literal definition, geometry, certificate wording,
+      and typical length-to-width range for the Dutch Marquise.
+    input_schema:
+      type: object
+      properties: {}
+  - name: lab_grown_grading_landscape
+    description: >
+      Explains the current Lab Grown Diamond grading landscape with dated sources
+      for GIA, IGI, HRD Antwerp, and the FTC position.
+    input_schema:
+      type: object
+      properties: {}
+  - name: lab_grown_price_index
+    description: >
+      Returns the latest tracked Lab Grown Diamond retail price reading with its
+      source and date as shopper context, not investment guidance.
+    input_schema:
+      type: object
+      properties: {}
+  - name: about_stienhardt
+    description: >
+      Returns a sourced and dated fact sheet about Stienhardt & Stones and its
+      New York City operation.
+    input_schema:
+      type: object
+      properties: {}
+  - name: define
+    description: >
+      Looks up one diamond or gemology term in the sourced 90-term encyclopedia
+      and returns the full entry with related terms and source citations.
+    input_schema:
+      type: object
+      properties:
+        term:
+          type: string
+          description: A diamond or gemology term.
+      required:
+        - term
+  - name: search_encyclopedia
+    description: >
+      Searches the 90-term diamond and gemology encyclopedia and ranks matching
+      definitions by relevance.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Keywords to search for.
+        limit:
+          type: integer
+          description: Maximum results from 1 to 10.
+      required:
+        - query
+  - name: search_inventory
+    description: >
+      Searches live Stienhardt inventory for certified Lab Grown Diamonds,
+      engagement-ring settings, and fine jewelry, returning prices and tagged
+      product links.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: The product request in plain words.
+        limit:
+          type: integer
+          description: Maximum results from 1 to 10.
+      required:
+        - query
+  - name: get_product
+    description: >
+      Returns current price, availability, options, images, and a tagged product
+      URL for one Stienhardt product returned by search_inventory.
+    input_schema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Shopify product identifier returned by search_inventory.
+      required:
+        - id
+install:
+  npm: diamond-mcp
+  command: npx
+  args:
+    - "-y"
+    - diamond-mcp
+license: MIT
+version: "0.2.5"
+stars: 1
