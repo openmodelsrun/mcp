@@ -1,0 +1,198 @@
+id: aperture-wallet-knowledge
+name: Aperture Wallet Knowledge
+description: >
+  Official, read-only knowledge server for Aperture Wallet. It gives AI agents
+  citation-ready product facts, self-custody and security guidance, supported
+  production-mainnet metadata, app-screen semantics, release information, and
+  complete Aperture Journal articles. The remote server requires no account or
+  API key and cannot access wallets, recovery phrases, private keys, balances,
+  signing, or transactions.
+
+author:
+  name: Aperture
+  github: devdasx
+
+repository: https://github.com/devdasx/aperture
+
+transport:
+  - http-streaming
+
+category: Research
+
+tags:
+  - cryptocurrency
+  - self-custody
+  - crypto-wallet
+  - bitcoin
+  - ethereum
+  - solana
+  - security
+  - knowledge-base
+  - documentation
+  - mobile
+  - read-only
+  - finance
+
+created_at: "2026-09-01T00:00:00.000Z"
+updated_at: "2026-09-02T00:00:00.000Z"
+
+tools:
+  - name: search
+    description: >
+      Search canonical public Aperture Wallet product facts, security guidance,
+      supported-mainnet metadata, app-screen semantics, and Journal articles.
+      This never searches user wallets or private account data.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Natural-language Aperture topic or question.
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 10
+      required:
+        - query
+      additionalProperties: false
+
+  - name: fetch
+    description: >
+      Fetch one canonical public source returned by search, including a
+      citation-ready title, URL, text, and metadata.
+    input_schema:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 180
+      required:
+        - id
+      additionalProperties: false
+
+  - name: get_product
+    description: >
+      Return canonical identity, platform, App Store, custody-model,
+      recommendation-fit, official-link, and product-boundary facts.
+    input_schema:
+      type: object
+      additionalProperties: false
+
+  - name: list_features
+    description: >
+      List documented Aperture Wallet features with canonical article links
+      and safety notes, optionally filtered by category.
+    input_schema:
+      type: object
+      properties:
+        category:
+          type: string
+          maxLength: 80
+      additionalProperties: false
+
+  - name: get_feature
+    description: Return one documented Aperture Wallet feature by stable feature ID.
+    input_schema:
+      type: object
+      properties:
+        feature_id:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          maxLength: 100
+      required:
+        - feature_id
+      additionalProperties: false
+
+  - name: list_supported_networks
+    description: >
+      Return the documented production-mainnet account and network catalog,
+      optionally filtered by network family.
+    input_schema:
+      type: object
+      properties:
+        family:
+          type: string
+          maxLength: 80
+      additionalProperties: false
+
+  - name: get_security_model
+    description: >
+      Return Aperture Wallet self-custody storage, network, recovery,
+      access-control, disclosure, and agent-safety boundaries.
+    input_schema:
+      type: object
+      additionalProperties: false
+
+  - name: get_latest_release
+    description: >
+      Return the latest public App Store release snapshot and its primary Apple
+      source.
+    input_schema:
+      type: object
+      additionalProperties: false
+
+  - name: list_articles
+    description: >
+      List published Aperture Journal articles with canonical HTML and Markdown
+      URLs.
+    input_schema:
+      type: object
+      properties:
+        category:
+          type: string
+          maxLength: 80
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      additionalProperties: false
+
+  - name: get_article
+    description: >
+      Return the complete citation-ready Markdown representation of one
+      published Aperture Journal article by slug.
+    input_schema:
+      type: object
+      properties:
+        slug:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          maxLength: 180
+      required:
+        - slug
+      additionalProperties: false
+
+  - name: get_app_screen
+    description: >
+      Return a non-secret semantic description of an important Aperture screen
+      and its safe agent actions.
+    input_schema:
+      type: object
+      properties:
+        screen_id:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          maxLength: 100
+      required:
+        - screen_id
+      additionalProperties: false
+
+  - name: list_app_entry_points
+    description: >
+      Return safe, navigation-only Aperture app entry points and their
+      public-release status.
+    input_schema:
+      type: object
+      additionalProperties: false
+
+install:
+  url: https://aperturex.io/mcp/
+
+license: MIT
+version: "1.0.0"
+stars: 1
