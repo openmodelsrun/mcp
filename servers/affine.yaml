@@ -1,0 +1,119 @@
+id: affine
+name: AFFiNE MCP Server
+description: >
+  Official AFFiNE MCP server built into AFFiNE Cloud and self-hosted instances.
+  It lets AI agents connect to an AFFiNE workspace over authenticated
+  Streamable HTTP, search workspace documents and Edgeless whiteboards, and
+  read document content with workspace-scoped, revocable credentials. Read-only
+  access is the default; create and update tools are rolling out progressively.
+author:
+  name: AFFiNE
+  github: toeverything
+repository: https://github.com/toeverything/AFFiNE
+transport:
+  - http-streaming
+category: Productivity
+tags:
+  - affine
+  - knowledge-base
+  - notes
+  - documents
+  - whiteboard
+  - productivity
+  - self-hosted
+created_at: "2026-09-06T00:00:00.000Z"
+updated_at: "2026-09-06T00:00:00.000Z"
+tools:
+  - name: doc_search
+    description: >
+      Search AFFiNE workspace documents and Edgeless whiteboards by keyword and
+      semantic relevance, returning bounded passages with page or canvas
+      locators.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search query for the AFFiNE workspace.
+        doc_ids:
+          type: array
+          description: Optional document IDs to limit the search scope.
+          items:
+            type: string
+          maxItems: 50
+        limit:
+          type: integer
+          description: Maximum number of hits to return.
+          minimum: 1
+          maximum: 20
+      required:
+        - query
+  - name: read_document
+    description: >
+      Read the full content of a document by ID, respecting the connected
+      user's workspace permissions.
+    input_schema:
+      type: object
+      properties:
+        docId:
+          type: string
+          description: AFFiNE document ID to read.
+      required:
+        - docId
+  - name: create_document
+    description: >
+      Create a new AFFiNE document from a title and Markdown content where
+      read-write MCP access has been enabled.
+    input_schema:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Document title.
+        content:
+          type: string
+          description: Markdown content for the new document.
+      required:
+        - title
+        - content
+  - name: update_document
+    description: >
+      Update an existing AFFiNE document body where read-write MCP access has
+      been enabled.
+    input_schema:
+      type: object
+      properties:
+        docId:
+          type: string
+          description: AFFiNE document ID to update.
+        content:
+          type: string
+          description: Replacement Markdown content.
+      required:
+        - docId
+        - content
+  - name: update_document_meta
+    description: >
+      Update document metadata such as the title where read-write MCP access has
+      been enabled.
+    input_schema:
+      type: object
+      properties:
+        docId:
+          type: string
+          description: AFFiNE document ID to update.
+        title:
+          type: string
+          description: New document title.
+      required:
+        - docId
+env_vars:
+  - name: AFFINE_WORKSPACE_ID
+    description: AFFiNE workspace ID used in the MCP endpoint URL.
+    required: true
+  - name: AFFINE_MCP_TOKEN
+    description: Workspace-scoped bearer credential generated in AFFiNE settings.
+    required: true
+license: AGPL-3.0
+version: "1.0.1"
+stars: 72221
