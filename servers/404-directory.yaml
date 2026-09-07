@@ -1,0 +1,168 @@
+id: 404-directory
+name: 404.directory
+description: >
+  A public, remote MCP server for AI agents that searches current official OpenAI,
+  Microsoft Learn, AWS, and Cloudflare documentation in one call. It also provides
+  capability-based tool discovery, machine-readable trust profiles, public deployment
+  verification, and controlled invocation of operator-curated, provider-verified,
+  read-only MCP tools. Connect over Streamable HTTP at https://404.directory/mcp;
+  no account or API key is required.
+author:
+  name: MM-sheng
+  github: MM-sheng
+repository: https://github.com/MM-sheng/404-directory
+transport:
+  - http-streaming
+category: Research
+tags:
+  - official-documentation
+  - documentation-search
+  - tool-discovery
+  - trust
+  - verification
+  - mcp-gateway
+  - read-only
+  - ai-agents
+created_at: "2026-08-21T00:00:00.000Z"
+updated_at: "2026-08-22T00:00:00.000Z"
+tools:
+  - name: search_official_docs
+    description: >
+      Search current first-party OpenAI, Microsoft Learn, AWS, and Cloudflare
+      documentation in one call, with per-provider provenance and partial-failure reporting.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          minLength: 2
+          maxLength: 512
+          description: Technical question or search phrase.
+        sources:
+          type: array
+          minItems: 1
+          maxItems: 4
+          items:
+            type: string
+            enum:
+              - openai
+              - microsoft
+              - aws
+              - cloudflare
+          description: Official providers to search; omit to search all four.
+        limit_per_source:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 4
+      required:
+        - query
+      additionalProperties: false
+  - name: search_tools
+    description: >
+      Search the 404.directory catalog by capability, protocol, category, or trust threshold
+      before selecting a third-party tool.
+    input_schema:
+      type: object
+      properties:
+        q:
+          type: string
+          maxLength: 256
+        capability:
+          type: string
+          maxLength: 64
+        protocol:
+          type: string
+          enum:
+            - mcp
+            - api
+            - a2a
+        category:
+          type: string
+          maxLength: 64
+        trust_threshold:
+          type: number
+          minimum: 0
+          maximum: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 10
+      additionalProperties: false
+  - name: get_tool
+    description: >
+      Fetch one registered ecosystem tool by ID or slug, including its trust profile and
+      aggregate usage statistics.
+    input_schema:
+      type: object
+      properties:
+        id_or_slug:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+        - id_or_slug
+      additionalProperties: false
+  - name: get_trust_score
+    description: >
+      Return the machine-readable trust profile for a catalog tool, covering ownership,
+      availability, compatibility, security, and aggregate usage.
+    input_schema:
+      type: object
+      properties:
+        id_or_slug:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+        - id_or_slug
+      additionalProperties: false
+  - name: verify_web
+    description: >
+      Independently verify that a public deployment is reachable and matches an expected
+      HTTP status, HTTPS/TLS state, and optional version-distinguishing text.
+    input_schema:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTP or HTTPS URL to verify.
+        expected_status:
+          type: integer
+          minimum: 100
+          maximum: 599
+        expected_text:
+          type: string
+          maxLength: 2000
+      required:
+        - url
+        - expected_status
+      additionalProperties: false
+  - name: invoke_registered_tool
+    description: >
+      Invoke one approved read-only tool on an active, provider-verified, operator-curated
+      public MCP server. Arbitrary URLs, authenticated servers, and destructive tools are rejected.
+    input_schema:
+      type: object
+      properties:
+        server_id_or_slug:
+          type: string
+          minLength: 1
+          maxLength: 128
+        tool_name:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[a-zA-Z0-9_.:-]+$"
+        arguments:
+          type: object
+          default: {}
+          additionalProperties: {}
+      required:
+        - server_id_or_slug
+        - tool_name
+      additionalProperties: false
+license: MIT
+version: "0.8.2"
