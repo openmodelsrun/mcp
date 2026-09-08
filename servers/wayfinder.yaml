@@ -1,0 +1,47 @@
+id: wayfinder
+name: Wayfinder
+description: >
+  Read existing, locally recorded AI coding sessions as task trees and
+  branches. The read-only wayfinder_show_map tool returns prompts, assistant
+  replies, notes, file-change metadata, verdicts, and structured lineage.
+  MCP Apps-capable clients can render the bundled interactive voyage map;
+  other clients receive text and structured data. Capture adapters and IDE
+  restore operations are separate from this MCP interface.
+author:
+  name: WBXWHT
+  github: WBXWHT
+repository: https://github.com/WBXWHT/wayfinder
+transport:
+  - stdio
+category: Development
+tags:
+  - ai-coding
+  - session-history
+  - decision-tracking
+  - local-first
+  - mcp-apps
+  - visualization
+created_at: "2026-09-07T22:14:25.000Z"
+updated_at: "2026-09-08T04:26:41.000Z"
+tools:
+  - name: wayfinder_show_map
+    description: >
+      Read the selected project's existing Wayfinder timeline and return a
+      text summary, structured task forest, and an interactive voyage-map
+      resource when the calling client supports MCP Apps. This tool does not
+      capture conversations, restore files, or modify the project.
+    input_schema:
+      type: object
+      properties:
+        root:
+          type: string
+          description: >
+            Optional absolute project directory. When omitted, the server uses
+            WAYFINDER_PROJECT_DIR or its current working directory.
+resources:
+  - uri_template: "ui://wayfinder/map"
+    description: >
+      Interactive HTML voyage map for clients that support MCP Apps resources.
+license: MIT
+version: "0.3.1"
+stars: 0
