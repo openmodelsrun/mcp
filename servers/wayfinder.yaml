@@ -22,7 +22,7 @@ tags:
   - mcp-apps
   - visualization
 created_at: "2026-09-07T22:14:25.000Z"
-updated_at: "2026-09-08T04:26:41.000Z"
+updated_at: "2026-09-08T10:30:07.000Z"
 tools:
   - name: wayfinder_show_map
     description: >
@@ -43,5 +43,5 @@ resources:
     description: >
       Interactive HTML voyage map for clients that support MCP Apps resources.
 license: MIT
-version: "0.3.1"
+version: "0.3.3"
 stars: 0
