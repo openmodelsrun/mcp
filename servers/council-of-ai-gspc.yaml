@@ -1,0 +1,131 @@
+id: council-of-ai-gspc
+name: Council of AI GSPC
+description: >
+  A zero-dependency MCP server for reading the live Council of AI GSPC board,
+  verifying signed measurement cards and Merkle inclusion, and requesting
+  x402-metered evidence products. It reports measured, unmeasured, unreachable,
+  valid, invalid, and uncheckable states explicitly. It provides measurement
+  evidence and does not certify systems.
+author:
+  name: CSOAI Ltd
+  github: CSOAI-ORG
+repository: https://github.com/CSOAI-ORG/councilof-ai
+transport:
+  - stdio
+  - http-streaming
+category: AI
+tags:
+  - ai-governance
+  - measurement
+  - gspc
+  - model-safety
+  - provenance
+  - ed25519
+  - merkle
+  - x402
+created_at: "2026-09-14T00:00:00.000Z"
+updated_at: "2026-09-14T00:00:00.000Z"
+tools:
+  - name: board_totals
+    description: Read live GSPC board slot and measurement totals with their dates.
+    input_schema: {type: object, properties: {}, additionalProperties: false}
+  - name: get_axis
+    description: Read one measured or unmeasured axis row from the live GSPC board.
+    input_schema:
+      type: object
+      properties:
+        axis: {type: string, description: Axis name from the live board.}
+      required: [axis]
+      additionalProperties: false
+  - name: verify_card
+    description: Verify a measurement card ID and signature against the published pinned key.
+    input_schema:
+      type: object
+      properties:
+        card:
+          description: A card object, JSON string, or Council of AI card URL.
+          anyOf: [{type: object}, {type: string}]
+      required: [card]
+      additionalProperties: false
+  - name: list_cards
+    description: List signed-card index rows and report source counts separately.
+    input_schema:
+      type: object
+      properties:
+        axis: {type: string, description: Optional axis filter.}
+        limit: {type: integer, minimum: 0, maximum: 150, description: Maximum rows to return.}
+      additionalProperties: false
+  - name: get_root
+    description: Read the current signed public Merkle root and its metadata.
+    input_schema: {type: object, properties: {}, additionalProperties: false}
+  - name: get_card
+    description: Fetch one public-root card leaf by its SHA-256 digest.
+    input_schema:
+      type: object
+      properties:
+        sha256: {type: string, description: A 64-character hexadecimal leaf digest.}
+      required: [sha256]
+      additionalProperties: false
+  - name: verify_inclusion
+    description: Check whether a SHA-256 digest is included in the live public Merkle root.
+    input_schema:
+      type: object
+      properties:
+        sha256: {type: string, description: A 64-character hexadecimal digest.}
+      required: [sha256]
+      additionalProperties: false
+  - name: x402_trust
+    description: Read the latest aggregate x402 catalog challenge and phantom-resource counts.
+    input_schema: {type: object, properties: {}, additionalProperties: false}
+  - name: commission_card
+    description: Request an x402 challenge or deliverable for a named measurement-card subject.
+    input_schema:
+      type: object
+      properties:
+        subject: {type: string, description: Model, instrument, or card identifier.}
+        axis: {type: string, description: Optional axis slug.}
+        x_payment: {type: string, description: Optional x402 payment authorization.}
+      required: [subject]
+      additionalProperties: false
+  - name: art50_marking_evidence
+    description: Request free preview or metered point-in-time Article 50 marking evidence.
+    input_schema:
+      type: object
+      properties:
+        url: {type: string, description: Public URL of the output to measure.}
+        bytes_b64: {type: string, description: Base64 output bytes.}
+        manifest_b64: {type: string, description: Base64 detached C2PA manifest.}
+        preview: {type: boolean, description: Return the free unsigned preview.}
+        x_payment: {type: string, description: Optional x402 payment authorization.}
+      additionalProperties: false
+  - name: rwa_evidence
+    description: Request free preview or metered deterministic XRPL issued-asset evidence.
+    input_schema:
+      type: object
+      properties:
+        asset: {type: string, description: Listed symbol or XRPL issuer address.}
+        preview: {type: boolean, description: Return the free unsigned state.}
+        x_payment: {type: string, description: Optional x402 payment authorization.}
+      required: [asset]
+      additionalProperties: false
+  - name: receipts_batch
+    description: Request free preview or metered assembly of historical measurement receipts.
+    input_schema:
+      type: object
+      properties:
+        from: {type: string, description: ISO-8601 window start.}
+        to: {type: string, description: ISO-8601 window end; defaults to now.}
+        preview: {type: boolean, description: Return free unsigned batch metadata.}
+        x_payment: {type: string, description: Optional x402 payment authorization.}
+      required: [from]
+      additionalProperties: false
+install:
+  npm: csoai-gspc-mcp
+  command: npx
+  args: ["-y", "csoai-gspc-mcp"]
+env_vars:
+  - name: GSPC_ORIGIN
+    description: Optional override for the default https://councilof.ai origin.
+    required: false
+license: Apache-2.0
+version: "0.2.2"
