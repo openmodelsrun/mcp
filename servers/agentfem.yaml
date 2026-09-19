@@ -1,0 +1,86 @@
+id: agentfem
+name: AgentFEM MCP
+description: >
+  Official local MCP interface for AgentFEM, an open-source finite-element
+  platform built on FEniCSx. AI agents can inspect runtime capabilities,
+  create projects, check models, launch serial or MPI simulations, and inspect
+  scientific results. Requires a separately installed AgentFEM numerical runtime;
+  the lightweight Python adapter does not bundle FEniCSx. Uses approved local
+  project roots and distinguishes completed, verified, and validated results.
+author:
+  name: Haoming Luo
+  github: haoming-luo
+repository: https://github.com/haoming-luo/agentfem-mcp
+transport: [stdio]
+category: Research
+tags: [finite-element, scientific-computing, computational-mechanics, fenicsx, simulation, engineering, ai-agents]
+created_at: "2026-09-20T00:00:00.000Z"
+updated_at: "2026-09-20T00:00:00.000Z"
+tools:
+  - name: describe_system
+    description: Inspect the installed AgentFEM runtime and capability map.
+    input_schema:
+      type: object
+      properties:
+        detail: {type: string, enum: [summary, full], default: summary}
+  - name: create_project
+    description: Create a project from a version-matched template within an approved root.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+        template: {type: string, default: static-solid}
+        name: {type: [string, "null"], default: null}
+      required: [path]
+  - name: validate_project
+    description: Check project structure and compatibility without solving.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+      required: [path]
+  - name: inspect_project
+    description: Inspect project validation and recent run identities.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+      required: [path]
+  - name: submit_run
+    description: Start a finite-element run in a separate process after preflight and return its job identity.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+        name: {type: string, default: agent}
+        mpi_ranks: {type: integer, default: 1}
+      required: [path]
+  - name: get_run_status
+    description: Read the status of a submitted run and available execution evidence.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+        job_id: {type: string}
+      required: [path, job_id]
+  - name: get_result_summary
+    description: Read a completed job or latest run's scientific result and trust state.
+    input_schema:
+      type: object
+      properties:
+        path: {type: string}
+        job_id: {type: [string, "null"], default: null}
+        detail: {type: string, enum: [summary, full], default: summary}
+      required: [path]
+install:
+  command: uvx
+  args: [--from, agentfem-mcp, agentfem-mcp]
+env_vars:
+  - name: AGENTFEM_MCP_ROOTS
+    description: Approved project directories separated by the platform path separator; defaults to the working directory. Set a dedicated project root, not the home directory.
+    required: false
+  - name: AGENTFEM_COMMAND
+    description: Absolute path to the installed agentfem executable if runtime auto-detection is insufficient.
+    required: false
+license: Apache-2.0
+version: "0.1.0"
