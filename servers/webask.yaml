@@ -1,0 +1,40 @@
+id: webask
+name: WebAsk MCP
+description: >
+  Hosted MCP server for creating surveys, forms, and quizzes, collecting responses,
+  and analyzing results with WebAsk. Provides 161 tools for questionnaire design,
+  publishing, response management, reports, and workspace administration. The public
+  repository contains connection examples, tool documentation, and 25 workflow skills
+  in English and Russian; the service implementation is hosted by WebAsk. Connect
+  over Streamable HTTP with your own WebAsk API key in the Authorization Bearer
+  header. Requires a WebAsk account, and available actions follow the account's
+  permissions. No local server installation is needed.
+author:
+  name: WebAsk
+  github: WebAskio
+repository: https://github.com/WebAskio/webask-mcp
+transport:
+  - http-streaming
+category: Productivity
+tags:
+  - surveys
+  - forms
+  - quizzes
+  - research
+  - analytics
+  - reports
+  - remote
+created_at: "2026-09-29T00:00:00.000Z"
+updated_at: "2026-09-29T00:00:00.000Z"
+install:
+  type: http
+  url: https://mcp.webask.io/mcp/v1
+  headers:
+    Authorization: "Bearer ${WEBASK_API_KEY}"
+env_vars:
+  - name: WEBASK_API_KEY
+    description: >
+      WebAsk API key created in WebAsk account settings under API / MCP.
+      Supply this value as a Bearer token in the Authorization header.
+    required: true
+version: "1.0.0"
