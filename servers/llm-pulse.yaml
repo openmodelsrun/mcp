@@ -1,0 +1,105 @@
+id: llm-pulse
+name: LLM Pulse
+description: >
+  Connects AI assistants to LLM Pulse for live AI-search analytics. Use it to
+  inspect brand visibility, mentions, citations, sentiment, share of voice,
+  competitor performance, and the sources cited by AI models. The hosted
+  Streamable HTTP server authenticates through OAuth 2.0.
+author:
+  name: LLM Pulse
+  github: LLM-Pulse
+repository: https://github.com/LLM-Pulse/llmpulse-mcp
+transport:
+  - http-streaming
+category: AI
+tags:
+  - ai-search
+  - brand-monitoring
+  - marketing-analytics
+  - citations
+  - sentiment
+  - share-of-voice
+  - oauth
+created_at: "2026-07-06T00:00:00.000Z"
+updated_at: "2026-09-19T00:00:00.000Z"
+tools:
+  - name: list_projects
+    description: List the projects available to the authenticated LLM Pulse user.
+    input_schema:
+      type: object
+      properties: {}
+  - name: get_summary
+    description: Return summary statistics for AI visibility metrics over a selected time window.
+    input_schema:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          description: LLM Pulse project ID
+        range:
+          type: integer
+          description: Number of days to include
+        metrics:
+          type: string
+          description: Comma-separated metric names
+      required:
+        - project_id
+  - name: get_sov
+    description: Compare the project's share of voice with its configured competitors.
+    input_schema:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          description: LLM Pulse project ID
+        range:
+          type: integer
+          description: Number of days to include
+        model:
+          type: string
+          description: Optional AI model filter
+      required:
+        - project_id
+  - name: get_top_sources
+    description: Rank the domains most often cited in AI answers for a project.
+    input_schema:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          description: LLM Pulse project ID
+        range:
+          type: integer
+          description: Number of days to include
+        model:
+          type: string
+          description: Optional AI model filter
+      required:
+        - project_id
+  - name: list_mentions
+    description: List brand mentions found in tracked AI answers.
+    input_schema:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          description: LLM Pulse project ID
+      required:
+        - project_id
+  - name: list_citations
+    description: List citations found in tracked AI answers for a project.
+    input_schema:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          description: LLM Pulse project ID
+      required:
+        - project_id
+install:
+  type: remote
+  url: https://api.llmpulse.ai/api/v1/mcp
+env_vars: []
+license: MIT
+version: "1.0.0"
+stars: 1
