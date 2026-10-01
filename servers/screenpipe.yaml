@@ -1,0 +1,158 @@
+# Custom source license: https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md
+# Representative stdio search schema from packages/screenpipe-mcp/src/index.ts.
+id: screenpipe
+name: Screenpipe MCP Server
+description: 'Search locally captured screen text and audio history to recall past work, retrieve meeting
+  transcripts, and give AI assistants context for summaries and follow-ups. Requires the Screenpipe recorder
+  and authenticated local API, normally on localhost:3030; the MCP package is not a standalone recorder.
+  Manual stdio setup requires Node/npx. The desktop app Settings > Connections setup is recommended and
+  supplies the bundled runtime and local API key. The representative tool schema below is search-content;
+  the stdio server also provides meeting, activity, workflow and other tools, some of which write data
+  or perform actions. See the current MCP README for the full inventory and HTTP transport differences:
+  https://github.com/screenpipe/screenpipe/tree/main/packages/screenpipe-mcp . Raw history stays local
+  by default; configured cloud AI, transcription, sync, integrations or a cloud MCP client can transmit
+  context off-device. Source-available under the Screenpipe Commercial License, not OSI open source. Current
+  app pricing: https://screenpipe.com/onboarding .'
+author:
+  name: Screenpipe
+  github: screenpipe
+repository: https://github.com/screenpipe/screenpipe
+transport:
+- stdio
+category: Productivity
+tags:
+- memory
+- screen-history
+- audio-transcription
+- meeting-notes
+- local-first
+- ai-context
+created_at: '2026-09-22T16:31:18.000Z'
+updated_at: '2026-09-22T16:31:18.000Z'
+tools:
+- name: search-content
+  description: 'Search screen text, audio transcriptions, input events, memories, and parsed app data.
+    Returns timestamped results with app context. USE WHEN: you need the actual text/content of a moment
+    — quotes, screen text, transcript lines, or compact parsed messages, emails, tasks, documents, and
+    code review — or want to filter by speaker/window. DO NOT USE for: broad questions like ''what was
+    I doing?'' (use activity-summary, it pre-summarizes apps + windows + transcripts). Also DO NOT USE
+    for: targeted UI controls (use search-elements). Start with limit=5, increase only if needed. Per-result
+    text is auto-truncated to 1000 chars; pass max_content_length=0 to opt out, or a custom integer to
+    override.'
+  input_schema:
+    type: object
+    properties:
+      q:
+        type: string
+        description: 'Full-text search query. Omit to return all content in time range. Avoid for audio
+          — transcriptions are noisy, q filters too aggressively. For an attached activity episode, its
+          generated title/summary are labels, not query terms: use the exact time range and artifact anchors
+          with q omitted.'
+      content_type:
+        type: string
+        enum:
+        - all
+        - ocr
+        - audio
+        - input
+        - accessibility
+        - memory
+        - parsed
+        description: 'Filter by content type. Use ''parsed'' for compact app-specific records such as
+          messages, emails, tasks, documents, and code review; it is experimental and may be empty when
+          parsing is disabled or unsupported. NOTE on screen text: ''ocr'' is a legacy label — it returns
+          ALL screen-text rows, which are accessibility-derived for most apps (the result tag [Screen·a11y]
+          vs [Screen·ocr] tells you which). Use ''ocr'' for screen text (covers both paths), ''audio''
+          for transcriptions, ''input'' for keyboard/mouse events, ''memory'' for stored facts. Default:
+          ''all''.'
+        default: all
+      limit:
+        type: integer
+        description: Max results (default 10, max 20). Start with 5 for exploration.
+        default: 10
+      offset:
+        type: integer
+        description: Pagination offset. Use when results say 'use offset=N for more'.
+        default: 0
+      start_time:
+        type: string
+        description: 'Accepted: ISO 8601 (''2024-01-15T10:00:00Z''), relative time, or local calendar
+          (''today'', ''yesterday'', ''tomorrow'', ''YYYY-MM-DD''). Always provide to avoid scanning entire
+          history.'
+      end_time:
+        type: string
+        description: ISO 8601, relative time, or local calendar ('today', 'yesterday', 'tomorrow', 'YYYY-MM-DD').
+          Defaults to now.
+      app_name:
+        type: string
+        description: Filter by app name (e.g. 'Google Chrome', 'Slack', 'zoom.us'). Case-sensitive.
+      window_name:
+        type: string
+        description: Filter by window title substring
+      frame_id:
+        type: integer
+        description: With content_type='parsed', return parsed data attached to one frame.
+      actor_id:
+        type: integer
+        description: With content_type='parsed', filter items by a resolved actor identity.
+      min_length:
+        type: integer
+        description: Min content length in characters
+      max_length:
+        type: integer
+        description: Max content length in characters
+      include_frames:
+        type: boolean
+        description: 'Include base64 screenshots (OCR only). Warning: large response.'
+        default: false
+      speaker_ids:
+        type: string
+        description: Comma-separated speaker IDs to filter audio
+      speaker_name:
+        type: string
+        description: Filter audio by speaker name (case-insensitive partial match)
+      tags:
+        type: string
+        description: Comma-separated tags; returns only items carrying ALL of them (e.g. 'person:ada,project:atlas').
+          Works for screen + audio (content_type 'ocr'/'audio'/'all', tags written by add-tags) AND memories
+          (content_type 'memory', tags written by update-memory). Same tag string links across all three,
+          so two items sharing a tag are connected. Use namespaced tags (person:, project:, topic:) to
+          link people/projects/topics. content_type 'input' and 'accessibility' have no tags and return
+          nothing when this is set; 'parsed' does not support tags.
+      include_related:
+        type: boolean
+        description: With tags set, also return the co-occurring tags (the people/projects/topics seen
+          alongside yours, ranked by frequency) as a 'Related:' line. One call for the surrounding context
+          instead of several follow-ups. Ignored without tags.
+        default: false
+      max_content_length:
+        type: integer
+        description: Truncate each result's text via middle-truncation. Use 200-500 to keep responses
+          compact.
+install:
+  npm: screenpipe-mcp
+  command: npx
+  args:
+  - -y
+  - screenpipe-mcp@latest
+env_vars:
+- name: SCREENPIPE_LOCAL_API_KEY
+  description: Recommended local API key from screenpipe auth token. The server attempts CLI discovery
+    if omitted; explicit configuration avoids slow cold starts. Never share its value.
+  required: false
+- name: SCREENPIPE_MCP_CLIENT
+  description: Optional supported client identifier for usage attribution when analytics are enabled;
+    otherwise uses the client initialization handshake.
+  required: false
+- name: SCREENPIPE_ENTERPRISE_TOKEN
+  description: Optional for local use. Enables enterprise team tools; see official documentation for alternate
+    token sources and required privileges.
+  required: false
+- name: SCREENPIPE_TEAM_API_URL
+  description: Optional organization query gateway URL for enterprise team tools.
+  required: false
+- name: SCREENPIPE_MCP_SENTRY_DISABLED
+  description: Set to 1 to disable MCP Sentry telemetry. SCREENPIPE_TELEMETRY_DISABLED=1 or SCREENPIPE_DISABLE_TELEMETRY=1
+    are documented alternatives.
+  required: false
+license: LicenseRef-Screenpipe-Commercial
