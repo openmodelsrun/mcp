@@ -1,0 +1,166 @@
+id: cos-codex-bridge
+name: CoS Codex Bridge
+description: >
+  A local-first MCP server that lets a Chief of Staff or other MCP client operate
+  Codex sessions without copy-paste. It can register allowed projects, find and
+  read sessions, deliver exact prompts with durable receipts and idempotent
+  request IDs, continue existing work, inspect progress, handle clarifications,
+  cancel bridge-owned jobs, manage versioned text artifacts, and assign, rename,
+  or pin sessions in Codex Desktop. Directory allowlists and honest busy, queued,
+  blocked, and uncertain states keep local automation scoped and auditable.
+author:
+  name: AV Labs
+  github: AV-Labs-Co
+repository: https://github.com/AV-Labs-Co/cos-codex-bridge
+transport:
+  - stdio
+category: Development
+tags:
+  - ai-agents
+  - automation
+  - chief-of-staff
+  - codex
+  - developer-tools
+  - grok-bot
+  - local-first
+  - model-context-protocol
+  - openai-codex
+  - session-management
+created_at: "2026-09-19T00:00:00.000Z"
+updated_at: "2026-09-22T00:00:00.000Z"
+tools:
+  - name: bridge_projects
+    description: List project aliases, create an allowed directory, or register and inspect a Codex Desktop project.
+    input_schema:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [list, create, register, inspect]
+        project:
+          type: string
+        parent:
+          type: string
+        name:
+          type: string
+  - name: bridge_sessions
+    description: Find or read existing allowed Codex sessions, including sessions created outside the bridge.
+    input_schema:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [find, read]
+        project:
+          type: string
+        query:
+          type: string
+        threadId:
+          type: string
+        includeOutput:
+          type: boolean
+        includeQueue:
+          type: boolean
+  - name: bridge_submit
+    description: Start or continue a Codex session with an exact UTF-8 prompt and a stable idempotent request ID.
+    input_schema:
+      type: object
+      properties:
+        project:
+          type: string
+        threadId:
+          type: string
+        prompt:
+          type: string
+        requestId:
+          type: string
+        onBusy:
+          type: string
+          enum: [reject, queue]
+      required: [project, requestId]
+  - name: bridge_receipt
+    description: Read a durable delivery receipt, state, hashes, task identifiers, and bounded output.
+    input_schema:
+      type: object
+      properties:
+        receiptId:
+          type: string
+        includeOutput:
+          type: boolean
+      required: [receiptId]
+  - name: bridge_steer
+    description: Retry recovery of an exact existing bridge queue item without silently resending or forking it.
+    input_schema:
+      type: object
+      properties:
+        threadId:
+          type: string
+        receiptId:
+          type: string
+        queuedSubmissionId:
+          type: string
+        requestId:
+          type: string
+        acceptDesktopPolicy:
+          type: boolean
+      required: [threadId, acceptDesktopPolicy]
+  - name: bridge_answer
+    description: Answer a pending Codex clarification without approving permission expansion.
+    input_schema:
+      type: object
+      properties:
+        receiptId:
+          type: string
+        questionId:
+          type: string
+        answers:
+          type: object
+      required: [receiptId, questionId, answers]
+  - name: bridge_cancel
+    description: Request cancellation of a bridge-owned running job and preserve an auditable receipt.
+    input_schema:
+      type: object
+      properties:
+        receiptId:
+          type: string
+      required: [receiptId]
+  - name: bridge_artifact
+    description: Create a versioned UTF-8 text artifact without overwrite, or read an existing artifact.
+    input_schema:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [write, read]
+        project:
+          type: string
+        name:
+          type: string
+        text:
+          type: string
+      required: [action, project, name]
+  - name: bridge_session_manage
+    description: Rename, pin or unpin, and assign an allowed Codex session to its registered project.
+    input_schema:
+      type: object
+      properties:
+        threadId:
+          type: string
+        title:
+          type: string
+        pin:
+          type: boolean
+        position:
+          type: string
+          enum: [first, last]
+        assignProject:
+          type: boolean
+      required: [threadId]
+  - name: bridge_doctor
+    description: Report local bridge mode, Codex version, allowed scope, and honest capability limits.
+    input_schema:
+      type: object
+      properties: {}
+license: MIT
+version: "0.1.0"
+stars: 2
