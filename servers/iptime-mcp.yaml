@@ -1,0 +1,85 @@
+id: iptime-mcp
+name: iptime-mcp
+description: >
+  A local stdio MCP server for ipTIME router administration. Detects router
+  interfaces and firmware-supported operations, reads network and system state,
+  and uses expiring reviewable plans for configuration changes across Wi-Fi,
+  NAT, firewall, VPN, DDNS, USB/NAS, firmware, and more.
+author:
+  name: mikusnuz
+  github: mikusnuz
+repository: https://github.com/mikusnuz/iptime-mcp
+transport:
+  - stdio
+category: DevOps
+tags:
+  - iptime
+  - router
+  - network
+  - home-network
+  - wifi
+created_at: "2026-09-23T20:11:11.000Z"
+updated_at: "2026-09-23T20:11:11.000Z"
+tools:
+  - name: iptime_status
+    description: Detect the router interface, authenticate if configured, and read product/system status.
+    input_schema: {type: object, properties: {router_id: {type: string}}}
+  - name: iptime_login
+    description: Authenticate with credentials supplied through the MCP environment.
+    input_schema: {type: object, properties: {router_id: {type: string}, captcha_code: {type: string}}}
+  - name: iptime_logout
+    description: End the router admin session.
+    input_schema: {type: object, properties: {router_id: {type: string}}}
+  - name: iptime_capabilities
+    description: Discover which catalogued operations this model and firmware expose.
+    input_schema: {type: object, properties: {router_id: {type: string}, domain: {type: string}, refresh: {type: boolean}}}
+  - name: iptime_list_operations
+    description: List the fixed local operation catalog without contacting the router.
+    input_schema: {type: object, properties: {domain: {type: string}, mode: {type: string, enum: [read, write]}}}
+  - name: iptime_read
+    description: Run one read-only catalog operation.
+    input_schema: {type: object, properties: {router_id: {type: string}, operation: {type: string}, params: {}}, required: [operation]}
+  - name: iptime_backup_config
+    description: Save the current router configuration to a new local .config file.
+    input_schema: {type: object, properties: {router_id: {type: string}, output_path: {type: string}}, required: [output_path]}
+  - name: iptime_plan_change
+    description: Create an expiring plan for a router change without applying it.
+    input_schema: {type: object, properties: {router_id: {type: string}, operation: {type: string}, params: {}}, required: [operation]}
+  - name: iptime_plan_firmware_upgrade
+    description: Hash a local firmware image and prepare a critical-risk upgrade plan.
+    input_schema: {type: object, properties: {router_id: {type: string}, file_path: {type: string}}, required: [file_path]}
+  - name: iptime_plan_config_restore
+    description: Hash a local configuration backup and prepare a critical-risk restore plan.
+    input_schema: {type: object, properties: {router_id: {type: string}, file_path: {type: string}}, required: [file_path]}
+  - name: iptime_apply_change
+    description: Apply exactly one pending router change plan.
+    input_schema: {type: object, properties: {plan_id: {type: string, format: uuid}}, required: [plan_id]}
+  - name: iptime_cancel_change
+    description: Cancel a pending router change plan.
+    input_schema: {type: object, properties: {plan_id: {type: string, format: uuid}}, required: [plan_id]}
+  - name: iptime_list_plans
+    description: List change plans and their current state.
+    input_schema: {type: object, properties: {router_id: {type: string}}}
+resources:
+  - uri_template: "iptime://configuration"
+    description: Configured router profiles with credentials omitted.
+  - uri_template: "iptime://operations"
+    description: Router operation catalog with domains, modes, risks, and parameter hints.
+install:
+  npm: iptime-mcp
+  command: npx
+  args:
+    - "-y"
+    - "iptime-mcp"
+env_vars:
+  - name: IPTIME_ROUTER_URL
+    description: Base URL of the ipTIME router admin interface.
+    required: true
+  - name: IPTIME_ROUTER_USERNAME
+    description: Router administrator username.
+    required: true
+  - name: IPTIME_ROUTER_PASSWORD
+    description: Router administrator password.
+    required: true
+license: MIT
+version: "0.2.0"
