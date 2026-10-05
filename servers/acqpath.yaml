@@ -1,0 +1,22 @@
+id: acqpath
+name: AcqPath
+description: >
+  Remote MCP server providing signed, timestamped observations of machine-readable
+  source-rights declarations for RAG ingestion, indexing, training, search, and AI input.
+  Evidence only; it does not grant licences, determine ownership, bypass access controls,
+  or treat UNKNOWN as permission.
+author:
+  name: AcqPath
+  github: reflectme-source
+repository: https://github.com/reflectme-source/acqpath-distribution
+transport:
+  - http-streaming
+category: Security
+tags:
+  - rights
+  - provenance
+  - compliance
+  - rag
+  - governance
+created_at: "2026-10-05T14:36:50.624Z"
+updated_at: "2026-10-05T14:36:50.624Z"
