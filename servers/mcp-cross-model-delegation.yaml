@@ -1,0 +1,92 @@
+id: mcp-cross-model-delegation
+name: MCP Cross-Model Delegation
+description: >
+  Exposes bounded delegation and evidence-backed extraction as MCP tools for
+  configured Gemini and Anthropic API providers. A local router filters declared
+  privacy and capability constraints before selecting a provider; quotations in
+  structured findings are checked against caller-supplied context. The source
+  repository includes an offline FakeProvider benchmark and reproducible result
+  artifacts. Clone the repository and follow its README before using `uv run
+  crossmodel serve`; live provider calls require an API key and may incur charges.
+author:
+  name: Jostophe-021
+  github: Jostophe-021
+repository: https://github.com/Jostophe-021/mcp-cross-model-delegation
+transport:
+  - http-streaming
+category: AI
+tags:
+  - mcp
+  - model-routing
+  - multi-llm
+  - llm-evaluation
+  - benchmark
+created_at: "2026-09-25T08:20:00.000Z"
+updated_at: "2026-09-25T08:20:00.000Z"
+tools:
+  - name: delegate_task
+    description: Delegate an authorized bounded text task to a configured provider with optional policy and routing constraints.
+    input_schema:
+      type: object
+      properties:
+        task:
+          type: string
+        context:
+          type: string
+        provider:
+          type: string
+        policy:
+          type: string
+          enum: [manual, rules, benchmark_weighted]
+        constraints:
+          type: object
+      required: [task]
+  - name: extract_findings
+    description: Extract structured findings from caller-supplied context and verify cited quotations locally.
+    input_schema:
+      type: object
+      properties:
+        question:
+          type: string
+        context:
+          type: string
+        provider:
+          type: string
+        policy:
+          type: string
+          enum: [manual, rules, benchmark_weighted]
+        constraints:
+          type: object
+      required: [question, context]
+  - name: gemini_delegate_task
+    description: Compatibility alias for bounded delegation to the configured Gemini provider.
+    input_schema:
+      type: object
+      properties:
+        task:
+          type: string
+        context:
+          type: string
+      required: [task]
+  - name: gemini_extract_findings
+    description: Compatibility alias for Gemini extraction with local quotation verification.
+    input_schema:
+      type: object
+      properties:
+        question:
+          type: string
+        context:
+          type: string
+      required: [question, context]
+install:
+  command: uv
+  args: [run, crossmodel, serve]
+env_vars:
+  - name: GEMINI_API_KEY
+    description: Optional Gemini API key; configure this or ANTHROPIC_API_KEY for real delegation.
+    required: false
+  - name: ANTHROPIC_API_KEY
+    description: Optional Anthropic API key; configure this or GEMINI_API_KEY for real delegation.
+    required: false
+license: Apache-2.0
+version: "1.0.0"
