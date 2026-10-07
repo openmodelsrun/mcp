@@ -1,0 +1,33 @@
+id: statsnet
+name: Statsnet
+description: >
+  Company data for Kazakhstan, Uzbekistan and Kyrgyzstan: registration,
+  executives and finances via a remote streamable-HTTP MCP endpoint.
+author: {name: Statsnet, github: usenetstate}
+repository: https://github.com/usenetstate/statsnet-mcp
+transport: [http-streaming]
+category: Research
+tags: [company-data, kazakhstan, uzbekistan, kyrgyzstan, business, finance, remote]
+created_at: "2026-09-15T00:00:00.000Z"
+updated_at: "2026-09-15T00:00:00.000Z"
+license: MIT
+version: "1.0.0"
+tools:
+  - name: search_companies
+    description: Search companies by name, BIN/IIN, or executive across KZ, UZ, and KG.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Company name, identifier, or executive name
+      required: [query]
+  - name: get_company
+    description: Get a public Markdown company card with status, registration, leadership, contracts, courts, and finances.
+    input_schema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Company identifier
+      required: [id]
