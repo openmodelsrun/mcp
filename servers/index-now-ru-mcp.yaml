@@ -1,0 +1,29 @@
+id: index-now-ru-mcp
+name: Index-Now.ru MCP Server
+description: >
+  Remote MCP server for Index-Now.ru. Authenticated users can inspect projects
+  and sites, submit URLs for indexing, retrieve statuses and history, work with
+  sitemaps, and run page SEO audits through the Index-Now.ru cloud API at
+  https://index-now.ru/mcp.
+author:
+  name: Arseniy Gruzdev
+  github: arseniigruzdev
+repository: https://github.com/arseniigruzdev/index-now-ru-mcp
+transport:
+  - http-streaming
+category: Cloud
+tags:
+  - mcp
+  - seo
+  - indexnow
+  - url-submission
+  - sitemap
+  - site-audit
+created_at: "2026-08-31T00:00:00.000Z"
+updated_at: "2026-08-31T00:00:00.000Z"
+env_vars:
+  - name: INDEX_NOW_API_KEY
+    description: User API key sent as a Bearer Authorization header to Index-Now.ru.
+    required: true
+license: CC0-1.0
+version: "1.0.0"
