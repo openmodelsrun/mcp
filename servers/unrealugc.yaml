@@ -1,0 +1,186 @@
+id: unrealugc
+name: UnrealUGC MCP Server
+description: >
+  Official Model Context Protocol server for UnrealUGC. It lets AI assistants
+  browse video models, creators, voices, projects, and generation history;
+  estimate credit costs; and create AI UGC video ads from scripts and product
+  assets. Use it to automate creator selection, campaign organization, video
+  generation, and generation-status monitoring.
+author:
+  name: UnrealUGC
+  github: UnrealUGC
+repository: https://github.com/UnrealUGC/mcp
+transport:
+  - stdio
+  - http-streaming
+category: AI
+tags:
+  - ai-video
+  - ugc
+  - video-generation
+  - marketing
+  - advertising
+  - content-creation
+created_at: "2026-08-18T00:00:00.000Z"
+updated_at: "2026-08-18T00:00:00.000Z"
+tools:
+  - name: get_me
+    description: Get the authenticated UnrealUGC account, plan, subscription status, and credit balance.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+  - name: get_credits
+    description: Get subscription and purchased credit balances before generating videos.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+  - name: list_models
+    description: List available AI video models, formats, and audio capabilities.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+  - name: list_creators
+    description: List stock AI creators and the account's custom avatars.
+    input_schema:
+      type: object
+      properties:
+        include:
+          type: string
+          enum: [stock, custom]
+      additionalProperties: false
+  - name: list_voices
+    description: List stock voices and the account's custom voices.
+    input_schema:
+      type: object
+      properties:
+        include:
+          type: string
+          enum: [stock, custom]
+      additionalProperties: false
+  - name: list_projects
+    description: List projects used to group videos by product or campaign.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: number
+          minimum: 1
+          maximum: 100
+      additionalProperties: false
+  - name: create_project
+    description: Create a project for a product or campaign.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        productName:
+          type: string
+        productDescription:
+          type: string
+        productUrl:
+          type: string
+          format: uri
+      required: [name]
+      additionalProperties: false
+  - name: list_videos
+    description: List video generations with status and project filters plus cursor pagination.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: number
+          minimum: 1
+          maximum: 100
+        status:
+          type: string
+          enum: [DRAFT, GENERATING, RENDERING, COMPLETED, FAILED]
+        projectId:
+          type: string
+        cursor:
+          type: string
+      additionalProperties: false
+  - name: get_video
+    description: Get a video generation by ID and retrieve its output URL when complete.
+    input_schema:
+      type: object
+      properties:
+        id:
+          type: string
+      required: [id]
+      additionalProperties: false
+  - name: estimate_video_cost
+    description: Estimate the credit cost of a proposed video before generating it.
+    input_schema:
+      type: object
+      properties:
+        videoModel:
+          type: string
+        presetSlug:
+          type: string
+        script:
+          type: string
+        scriptLength:
+          type: number
+        useNativeAudio:
+          type: boolean
+        voiceModel:
+          type: string
+      additionalProperties: false
+  - name: generate_video
+    description: Start an asynchronous AI UGC video generation from a script and creator.
+    input_schema:
+      type: object
+      properties:
+        script:
+          type: string
+        productName:
+          type: string
+        productDescription:
+          type: string
+        creatorId:
+          type: string
+        customCreatorId:
+          type: string
+        videoModel:
+          type: string
+        presetSlug:
+          type: string
+        voiceId:
+          type: string
+        voiceModel:
+          type: string
+        useNativeAudio:
+          type: boolean
+        dialogue:
+          type: boolean
+        clipMode:
+          type: string
+          enum: [parallel, sequential]
+        aspectRatio:
+          type: string
+        projectId:
+          type: string
+        productImageUrl:
+          type: string
+          format: uri
+      required: [script, productName]
+      additionalProperties: false
+install:
+  npm: "@unrealugc/mcp"
+  command: npx
+  args:
+    - "-y"
+    - "@unrealugc/mcp"
+env_vars:
+  - name: UNREALUGC_API_KEY
+    description: UnrealUGC API key from Dashboard, Settings, API Keys.
+    required: true
+license: MIT
+version: "1.0.0"
+stars: 0
