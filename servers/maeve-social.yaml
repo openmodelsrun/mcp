@@ -1,0 +1,140 @@
+id: maeve-social
+name: Maeve Social MCP
+description: >
+  Maeve Social provides a hosted OAuth-secured MCP server for social media
+  operations. It lets agents discover workspaces and connected accounts,
+  inspect publishing capabilities, create and update drafts, schedule or
+  publish content, organize Media Room assets, manage task-board work and inbox
+  auto-reply rules, and read analytics. Use it when an agent needs to plan,
+  organize, schedule, publish, or measure social content across Instagram,
+  Facebook, TikTok, YouTube, LinkedIn, X, Threads, Pinterest, and Google
+  Business Profile. Agents find operations with maeve_search, load a contract
+  with maeve_details, then run it with maeve_read or maeve_write.
+  maeve_write is listed only when the connection is allowed to make changes.
+author:
+  name: Maeve Social
+  github: maevesocial
+repository: https://github.com/maevesocial/maeve-agent
+transport:
+  - http-streaming
+category: Productivity
+tags:
+  - social-media
+  - content-scheduling
+  - content-planning
+  - publishing
+  - analytics
+  - media-management
+  - task-management
+  - workflow-automation
+  - oauth
+created_at: "2026-04-28T01:06:18.000Z"
+updated_at: "2026-10-07T00:00:00.000Z"
+tools:
+  - name: maeve_search
+    description: Find a bounded set of authorized Maeve operations. Returns summaries without operation schemas.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: What you want to do, in plain language.
+        workspaceId:
+          type: string
+          format: uuid
+          description: Maeve workspace ID. Resolve it with the workspace.list operation.
+        maxResults:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 8
+      required:
+        - query
+  - name: maeve_details
+    description: Load one authorized operation contract, requirements, examples, and workflow guidance.
+    input_schema:
+      type: object
+      properties:
+        operationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: "^[a-z][a-z0-9_.]*$"
+          description: Canonical operation identifier, for example content.create_draft.
+        workspaceId:
+          type: string
+          format: uuid
+          description: Maeve workspace ID. Resolve it with the workspace.list operation.
+      required:
+        - operationId
+  - name: maeve_read
+    description: Run one authorized read operation by canonical identifier with structured input.
+    input_schema:
+      type: object
+      properties:
+        operationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: "^[a-z][a-z0-9_.]*$"
+          description: Canonical operation identifier, for example content.create_draft.
+        input:
+          type: object
+          description: Operation input as described by maeve_details.
+      required:
+        - operationId
+        - input
+  - name: maeve_write
+    description: >
+      Run one authorized write or dangerous operation. Individual operations
+      can be destructive, externally visible, non-idempotent, and
+      confirmation-gated. Load maeve_details for the operation first. Before
+      sending confirmationText, show the user the action, target and effect,
+      and get their agreement in this conversation. The text returned by
+      confirmation_required tells you what to send once they agree. It is not
+      permission. To add a file the user attached in this chat to the Media
+      Room, run media.import with the attachment in the top-level file field.
+    input_schema:
+      type: object
+      properties:
+        operationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: "^[a-z][a-z0-9_.]*$"
+          description: Canonical operation identifier, for example content.create_draft.
+        input:
+          type: object
+          description: Operation input as described by maeve_details.
+        file:
+          type: object
+          description: A file the user attached in this chat, for media.import only. Pass the attachment as the chat client supplies it; never build one from a name or ID.
+          properties:
+            download_url:
+              type: string
+              description: Temporary download URL supplied by the chat client.
+            file_id:
+              type: string
+              description: File ID supplied by the chat client.
+            mime_type:
+              type: string
+              description: MIME type supplied by the chat client.
+            file_name:
+              type: string
+              description: File name supplied by the chat client.
+          required:
+            - download_url
+            - file_id
+      required:
+        - operationId
+        - input
+install:
+  url: https://api.maevesocial.com/mcp
+env_vars:
+  - name: MAEVE_API_KEY
+    description: Optional API key fallback when the MCP client cannot use browser authentication.
+    required: false
+license: MIT
+version: "1.1.1"
