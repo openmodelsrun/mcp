@@ -1,0 +1,40 @@
+id: rowsafe
+name: RowSafe MCP Server
+description: >
+  Go-based MCP server included in the RowSafe CLI for inspecting PostgreSQL
+  protection, backups, restore-test results, and database health. Runs over stdio
+  and is read-only by default. The --allow-restore-points option additionally
+  exposes restore-point creation for checkpoints before risky database changes.
+  Install the RowSafe CLI and authenticate with rowsafe login before starting
+  the server. Configure the databases to inspect. The agent,
+  CLI, and MCP server are Apache-2.0 licensed; the hosted RowSafe service is
+  separate. Documentation and setup: https://rowsafe.sh/docs.
+author:
+  name: RowSafe
+  github: rowsafe
+repository: https://github.com/rowsafe/rowsafe
+transport:
+  - stdio
+category: Database
+tags:
+  - postgresql
+  - database
+  - backups
+  - restore-points
+  - monitoring
+  - go
+created_at: "2026-10-15T00:00:00.000Z"
+updated_at: "2026-10-15T00:00:00.000Z"
+install:
+  command: rowsafe
+  args:
+    - mcp
+    - --allow-restore-points
+env_vars:
+  - name: ROWSAFE_URL
+    description: RowSafe service URL, as an alternative to the saved login configuration.
+    required: false
+  - name: ROWSAFE_API_KEY
+    description: RowSafe API key, as an alternative to the saved login configuration.
+    required: false
+license: Apache-2.0
