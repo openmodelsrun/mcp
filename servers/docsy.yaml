@@ -1,0 +1,108 @@
+id: docsy
+name: Docsy — Versioned Developer Documentation
+description: Hosted, free, read-only remote MCP server for source-linked developer documentation. Resolve package
+  IDs, query version-specific library documentation, list indexed versions, search across public docs, and fetch
+  a cited result by ID. Connect directly to https://docsy.remcp.site/mcp/registry via Streamable HTTP without an
+  API key. The public GitHub repository contains the open-source MCP client plugin and manifests; the hosted indexing
+  backend is a managed service.
+author:
+  name: getremcp
+  github: getremcp
+repository: https://github.com/getremcp/docsy-plugin
+transport:
+- http-streaming
+category: Development
+tags:
+- documentation
+- developer-tools
+- mcp
+- library-docs
+- source-links
+- versioned-docs
+- read-only
+- coding-agents
+created_at: '2026-10-14T16:33:42.111Z'
+updated_at: '2026-10-15T12:49:18.000Z'
+tools:
+- name: resolve-library-id
+  description: Resolve a package or product name to a Docsy library ID. Call before query-docs unless an exact /org/project
+    or /org/project/version ID is already known. The query is used only to rank likely libraries; do not include
+    credentials, PII, proprietary code, or other confidential data.
+  input_schema:
+    type: object
+    properties:
+      libraryName:
+        type: string
+        minLength: 1
+        maxLength: 200
+        description: Official library, framework, SDK, API, CLI, or product name to resolve.
+      query:
+        type: string
+        minLength: 1
+        maxLength: 2000
+        description: What documentation you need so Docsy can rank matching libraries. Keep it focused and never
+          include secrets, credentials, PII, proprietary code, or confidential data.
+    required:
+    - libraryName
+    - query
+- name: query-docs
+  description: Retrieve current, version-aware documentation and code examples from one Docsy library. Resolve the
+    library ID first unless an exact ID is already known. Keep each query to one concept and do not call this tool
+    more than 3 times for one user question.
+  input_schema:
+    type: object
+    properties:
+      libraryId:
+        type: string
+        minLength: 3
+        maxLength: 500
+        description: Exact Docsy library ID such as /org/project or /org/project/version.
+      query:
+        type: string
+        minLength: 2
+        maxLength: 4000
+        description: Specific documentation concept to retrieve. Use one topic per query and never include secrets,
+          credentials, PII, proprietary code, or confidential data.
+      limit:
+        description: Maximum number of documentation chunks to return; omit to use the production default.
+        type: integer
+        minimum: 1
+        maximum: 15
+    required:
+    - libraryId
+    - query
+- name: list-library-versions
+  description: List indexed versions plus a bounded catalog of available stable GitHub releases for trusted Docsy
+    libraries.
+  input_schema:
+    type: object
+    properties:
+      libraryId:
+        type: string
+        minLength: 3
+        maxLength: 500
+    required:
+    - libraryId
+- name: search
+  description: Search all public indexed documentation and return stable IDs and absolute URLs.
+  input_schema:
+    type: object
+    properties:
+      query:
+        type: string
+        minLength: 1
+        maxLength: 4000
+    required:
+    - query
+- name: fetch
+  description: Fetch one search result by stable ID.
+  input_schema:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+    required:
+    - id
+version: 1.0.6
