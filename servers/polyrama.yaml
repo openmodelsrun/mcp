@@ -1,0 +1,166 @@
+id: polyrama
+name: Polyrama
+description: >
+  Official MCP server for researching Polymarket and Kalshi through Polyrama.
+  It provides typed tools for live market search and odds, market details,
+  public-wallet analytics, trader leaderboards, whale and mispricing signals,
+  dashboard state, historical backtests, and paper-only orders. It does not
+  expose a live-order tool.
+author:
+  name: Polyrama
+  github: Polyrama
+repository: https://github.com/Polyrama/mcp
+transport:
+  - stdio
+category: Research
+tags:
+  - prediction-markets
+  - polymarket
+  - kalshi
+  - market-data
+  - trader-analytics
+  - whale-tracking
+  - backtesting
+  - paper-trading
+created_at: "2026-08-18T00:00:00.000Z"
+updated_at: "2026-08-18T00:00:00.000Z"
+tools:
+  - name: polyrama_search_markets
+    description: Search live prediction markets across Polymarket and Kalshi, with price filters and sorting.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+        limit:
+          type: number
+        offset:
+          type: number
+        sort:
+          type: string
+        priceMin:
+          type: number
+        priceMax:
+          type: number
+  - name: polyrama_get_market
+    description: Get live odds, spread, volume, metadata, and history fields for one market by token ID.
+    input_schema:
+      type: object
+      properties:
+        tokenId:
+          type: string
+      required:
+        - tokenId
+  - name: polyrama_top_traders
+    description: Get the Polymarket wallet leaderboard with portfolio, P&L, volume, activity, and search filters.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: number
+        offset:
+          type: number
+        sort:
+          type: string
+        starredOnly:
+          type: boolean
+        query:
+          type: string
+  - name: polyrama_get_trader
+    description: Get one public Polymarket wallet's portfolio, positions, activity, history, and performance statistics.
+    input_schema:
+      type: object
+      properties:
+        address:
+          type: string
+        activityLimit:
+          type: number
+      required:
+        - address
+  - name: polyrama_refresh_trader
+    description: Refresh one public Polymarket wallet's positions and net worth.
+    input_schema:
+      type: object
+      properties:
+        address:
+          type: string
+      required:
+        - address
+  - name: polyrama_recent_signals
+    description: Get recent whale prints, volume spikes, price jolts, liquidity, wash-like trade, and market-mispricing signals.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: number
+        kinds:
+          type: string
+        unacknowledgedOnly:
+          type: boolean
+        sinceSeconds:
+          type: number
+  - name: polyrama_list_bots
+    description: List the authenticated account's configured Polyrama bots and their current status.
+    input_schema:
+      type: object
+      properties: {}
+  - name: polyrama_state_snapshot
+    description: Get the current Polyrama dashboard state, including quotes, positions, P&L, signals, wallets, and scanners.
+    input_schema:
+      type: object
+      properties: {}
+  - name: polyrama_run_backtest
+    description: Run a strategy against historical market data and return statistics, a P&L series, and paper fills.
+    input_schema:
+      type: object
+      properties:
+        strategy:
+          type: string
+        tokenId:
+          type: string
+        params:
+          type: object
+        interval:
+          type: string
+        fidelity:
+          type: number
+      required:
+        - strategy
+        - tokenId
+  - name: polyrama_place_paper_order
+    description: Record a paper-only trade in Polyrama; this tool never submits a live order.
+    input_schema:
+      type: object
+      properties:
+        botId:
+          type: string
+        tokenId:
+          type: string
+        side:
+          type: string
+        price:
+          type: number
+        size:
+          type: number
+        marketQuestion:
+          type: string
+        strategy:
+          type: string
+      required:
+        - botId
+        - tokenId
+        - side
+        - price
+        - size
+install:
+  npm: "@polyrama/mcp"
+  command: npx
+  args:
+    - "-y"
+    - "@polyrama/mcp"
+env_vars:
+  - name: POLYRAMA_API_TOKEN
+    description: Polyrama access token passed locally to the MCP process.
+    required: true
+license: MIT
+version: "1.0.0"
