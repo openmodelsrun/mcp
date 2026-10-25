@@ -1,0 +1,124 @@
+id: ukiyo
+name: Ukiyo GPU Cloud
+description: >
+  Official Ukiyo MCP server. Lets an AI agent rent an on-demand GPU (RTX 4090,
+  RTX 6000 Ada, A100), run commands on it over SSH and shut it down. The agent
+  lists live offers and prices, rents with prepaid account credit inside scoped
+  token limits (idempotent retries never double-rent), waits until the GPU is
+  ACTIVE, executes commands with the SSH key kept local, and terminates with
+  API-confirmed cleanup. Browsing offers needs no token; renting needs a funded
+  Ukiyo account token. Docs: https://docs.u-kiyo.ai/connect/mcp
+author:
+  name: Ukiyo Compute
+  github: ukiyocompute
+repository: https://github.com/ukiyocompute/ukiyo-mcp
+transport:
+  - stdio
+category: Cloud
+tags:
+  - gpu
+  - gpu-cloud
+  - gpu-rental
+  - compute
+  - ssh
+  - ai-agents
+created_at: "2026-10-25T15:28:00.000Z"
+updated_at: "2026-10-25T15:28:00.000Z"
+tools:
+  - name: get_account
+    description: Read the authenticated account, scoped key limits and prepaid balance.
+    input_schema:
+      type: object
+      properties: {}
+  - name: list_gpus
+    description: List GPU models with current customer pricing.
+    input_schema:
+      type: object
+      properties: {}
+  - name: list_offers
+    description: Discover current GPU offers, counts, prices and offer IDs.
+    input_schema:
+      type: object
+      properties: {}
+  - name: rent_gpu
+    description: >
+      Spend prepaid credits to create one rental within scoped token limits.
+      Reuse the same idempotencyKey after a timeout. Returns rentalId and deploymentId.
+    input_schema:
+      type: object
+      properties:
+        offerId:
+          type: string
+          description: Exact offer ID from list_offers.
+        budgetMinor:
+          type: integer
+          description: USD cents to spend; 500 means 5 dollars.
+        idempotencyKey:
+          type: string
+          description: Unique key per intended rental; keep it unchanged for retries.
+      required:
+        - offerId
+        - budgetMinor
+        - idempotencyKey
+  - name: get_rental
+    description: Read rental and deployment status, quote, failure and credit-reversal state; optionally wait for ACTIVE.
+    input_schema:
+      type: object
+      properties:
+        rentalId:
+          type: string
+          description: rentalId returned by rent_gpu.
+        waitForActive:
+          type: boolean
+          description: Wait until ACTIVE or a final failure.
+        timeoutSeconds:
+          type: integer
+          description: Maximum seconds to wait.
+      required:
+        - rentalId
+  - name: list_deployments
+    description: Inspect deployments accessible to the scoped token.
+    input_schema:
+      type: object
+      properties: {}
+  - name: run_command
+    description: Execute a shell command over SSH on an ACTIVE deployment; returns stdout, stderr and exitCode.
+    input_schema:
+      type: object
+      properties:
+        deploymentId:
+          type: string
+          description: Deployment to run the command on.
+        command:
+          type: string
+          description: Remote shell command, for example nvidia-smi.
+        timeoutSeconds:
+          type: integer
+          description: Maximum seconds to wait.
+      required:
+        - deploymentId
+        - command
+  - name: terminate_gpu
+    description: Irreversibly destroy the deployment and wait for API-confirmed TERMINATED.
+    input_schema:
+      type: object
+      properties:
+        deploymentId:
+          type: string
+          description: Deployment to terminate.
+        timeoutSeconds:
+          type: integer
+          description: Maximum seconds to wait.
+      required:
+        - deploymentId
+install:
+  command: node
+  args:
+    - "~/.ukiyo/ukiyo-mcp-0.2.0.mjs"
+env_vars:
+  - name: UKIYO_API_TOKEN
+    description: Scoped Ukiyo agent token (needed to rent; browsing is public)
+    required: false
+license: MIT
+version: "0.2.0"
+stars: 0
