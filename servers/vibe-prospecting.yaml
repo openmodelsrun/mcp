@@ -1,0 +1,21 @@
+id: vibe-prospecting
+name: Vibe Prospecting
+description: >
+  B2B company and contact intelligence for prospecting workflows. Power your chat with live B2B data to create lead lists, research companies, enrich contacts, personalize outreach, and inspect business signals, technology stacks, events, and website changes. MCP: https://vibeprospecting.explorium.ai/mcp
+author:
+  name: Explorium
+  github: explorium-ai
+repository: https://github.com/explorium-ai/vibeprospecting-mcp
+transport:
+  - http-streaming
+category: Research
+tags:
+  - prospecting
+  - b2b
+  - contacts
+  - lead-lists
+  - research
+  - outreach
+created_at: "2026-09-09T00:00:00.000Z"
+updated_at: "2026-09-09T00:00:00.000Z"
+license: MIT
