@@ -1,0 +1,273 @@
+id: videogen
+name: VideoGen MCP
+description: >
+  Official VideoGen MCP server for creating videos from scripts and storyboards,
+  managing editable projects, generating media, and exporting completed videos.
+  The pinned local package exposes 49 tools and four guidance resources; the four
+  tools below are representative entries with complete input schemas. The wider
+  inventory covers account and billing discovery, projects, files, reusable
+  entities, video workflows, image/audio/video generation, remixing and exports.
+  Local stdio requires Node.js 20+ and VIDEOGEN_API_KEY in the process environment.
+  Hosted Streamable HTTP connects to https://mcp.videogen.io/mcp using OAuth or
+  an Authorization: Bearer API_KEY HTTP header. A remote environment variable
+  is not an HTTP authentication header. A VideoGen account with API access is
+  required. Media generation and exports may consume account credits; obtain
+  the user's approval before starting credit-consuming operations. Setup guide
+  and product website: https://videogen.io/videogen-mcp
+author:
+  name: VideoGen
+  github: video-gen
+repository: https://github.com/video-gen/videogen-mcp
+transport:
+  - stdio
+  - http-streaming
+category: AI
+tags:
+  - ai-video
+  - video-generation
+  - storyboard
+  - media-creation
+created_at: "2026-10-02T07:57:00.000Z"
+updated_at: "2026-10-25T00:00:00.000Z"
+tools:
+  - name: script_to_video
+    description: "Preferred for narrated / informational / explainer videos from text, especially ~1 minute or longer. Turn a verbatim narration script into an editable video with AI-generated visuals and captions. Prefer this over storyboard_to_video unless the user wants a short shot-directed storyboard. For avatar narration, pass actorEntityId and optionally set avatarQuality."
+    input_schema:
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "script": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Narration script, spoken verbatim."
+          },
+          "style": {
+            "description": "Visual style for generated images. Write a full, strict paragraph in the same form as the app defaults below: name the medium, texture, and palette, then lock composition. Do not pass a short label such as \"watercolor\", \"flat art\", or \"cinematic\".\nImage models fill the frame with extra objects, readable text, charts, diagrams, tables, and labels unless the style forbids that. The still then looks crowded and hard to use. Every style must keep the picture simple. Include this composition lock verbatim: A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter. No on-image text, letters, labels, captions, charts, diagrams, tables, legends, or infographic layout unless the user explicitly asked for one specific word or number on screen.\nCopy an app default in full (those already include the uncluttered-subject lock), then add the no-text / no-diagram sentence if it is missing. A custom style is allowed only when it is equally long and strict, and includes the same composition lock. Omit this field for the Realistic default.\nWatercolor: Loose watercolor illustration, visible brushstrokes, soft color bleeds, paper texture, muted palette. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nRealistic: Photorealistic photograph, natural lighting\nWhiteboard: Minimalist whiteboard explainer style, simple line drawings, marker sketch aesthetic, clean white background, subtle accent colors. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\n3D cartoon: 3D cartoon render, rounded forms, soft lighting, vibrant colors, clean matte materials, smooth stylized characters\nFlat art: Corporate memphis flat art illustration, simple geometric shapes, bold colors, clean composition, white background with sparse subtle geometric accents such as small dots, lines, or shapes scattered in the margins. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no busy background patterns.\nPaper: Paper collage illustration, torn edges, layered cut paper shapes, mixed media texture, handmade craft aesthetic, matte paper finish. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nInk paint: Traditional Japanese sumi-e ink wash painting, expressive black ink brushstrokes, varied tonal gradations from deep black to soft gray, rice-paper texture, minimalist composition. No text, letters, calligraphy, kanji, signatures, or red seal stamps unless explicitly required by the subject. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nAnime: Anime illustration, cel-shaded style, vibrant colors, clean linework, soft gradient backgrounds\nEditorial: Editorial illustration, conceptual art, bold geometric shapes, sophisticated color palette, negative space, minimalist composition, strong silhouette\nIsometric: Isometric 3D illustration, clean vector style, soft gradient background, matte pastel colors, simple geometric objects, no characters. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nClaymation: Claymation style, soft clay figurines, plasticine texture, handmade stop-motion aesthetic, warm studio lighting, shallow depth of field\nEducation: Educational infographic style, simple icons, pastel colors, white background. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nChalkboard: Simple, minimalist, white chalk line drawings on dark green chalkboard, hand-drawn sketch style, chalk dust texture. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nBoho: Simple graphic with only a few elements. Boho linocut poster. Textured organic strokes with crisp lines and a white textured background. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nPoster: Risograph print aesthetic, halftone texture, limited duotone palette, paper grain, high contrast, bold flat colors",
+            "type": "string",
+            "minLength": 1
+          },
+          "aspectRatio": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Aspect-ratio width unit (e.g. 16 for 16:9)."
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Aspect-ratio height unit (e.g. 9 for 16:9)."
+              }
+            },
+            "required": [
+              "width",
+              "height"
+            ],
+            "description": "Output aspect ratio as width:height units (not pixels). Example: { width: 16, height: 9 }."
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "STANDARD",
+              "HIGH",
+              "MAX"
+            ],
+            "description": "Generation quality. Omit to use workspace settings."
+          },
+          "language": {
+            "description": "Output language as a BCP-47 code, such as en, es, or fr.",
+            "type": "string"
+          },
+          "voiceId": {
+            "description": "Catalog display name (e.g. Matilda) or voice id from list_tts_voices.",
+            "type": "string"
+          },
+          "actorEntityId": {
+            "description": "Id of an ACTOR entity (vg_enti_...) with an image reference. When set, narration is delivered by that actor avatar.",
+            "type": "string"
+          },
+          "avatarQuality": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "STANDARD",
+              "HIGH",
+              "MAX"
+            ],
+            "description": "Avatar generation quality tier. Applies when actorEntityId is provided. Omit to use workspace settings."
+          },
+          "autoExport": {
+            "description": "When true (the default), the run stays in progress until an MP4 is ready. Use downloadUrl from the result. Set false only if you will call remix_project and then export_project yourself.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "script"
+        ]
+      }
+  - name: storyboard_to_video
+    description: "Build an editable video from an ordered storyboard (frame-by-frame shot list). Every scene needs a visual prompt and may include spoken words. Much more credit-heavy than script_to_video: use at most 3 scenes unless the user explicitly asks for more. Prefer script_to_video for ~1 minute+ narrated / informational videos. If the user has not named a workflow, ask with pros/cons before calling this."
+    input_schema:
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "scenes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "prompt": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Required visual description for this scene."
+                },
+                "voiceoverScript": {
+                  "description": "Optional words spoken during this scene.",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Optional scene title.",
+                  "type": "string"
+                },
+                "durationSeconds": {
+                  "description": "Optional scene duration in whole seconds (1-15).",
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 15
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "prompt"
+              ]
+            },
+            "description": "Ordered scenes. Every scene requires a visual `prompt`."
+          },
+          "style": {
+            "description": "Visual style for generated images. Write a full, strict paragraph in the same form as the app defaults below: name the medium, texture, and palette, then lock composition. Do not pass a short label such as \"watercolor\", \"flat art\", or \"cinematic\".\nImage models fill the frame with extra objects, readable text, charts, diagrams, tables, and labels unless the style forbids that. The still then looks crowded and hard to use. Every style must keep the picture simple. Include this composition lock verbatim: A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter. No on-image text, letters, labels, captions, charts, diagrams, tables, legends, or infographic layout unless the user explicitly asked for one specific word or number on screen.\nCopy an app default in full (those already include the uncluttered-subject lock), then add the no-text / no-diagram sentence if it is missing. A custom style is allowed only when it is equally long and strict, and includes the same composition lock. Omit this field for the Realistic default.\nWatercolor: Loose watercolor illustration, visible brushstrokes, soft color bleeds, paper texture, muted palette. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nRealistic: Photorealistic photograph, natural lighting\nWhiteboard: Minimalist whiteboard explainer style, simple line drawings, marker sketch aesthetic, clean white background, subtle accent colors. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\n3D cartoon: 3D cartoon render, rounded forms, soft lighting, vibrant colors, clean matte materials, smooth stylized characters\nFlat art: Corporate memphis flat art illustration, simple geometric shapes, bold colors, clean composition, white background with sparse subtle geometric accents such as small dots, lines, or shapes scattered in the margins. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no busy background patterns.\nPaper: Paper collage illustration, torn edges, layered cut paper shapes, mixed media texture, handmade craft aesthetic, matte paper finish. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nInk paint: Traditional Japanese sumi-e ink wash painting, expressive black ink brushstrokes, varied tonal gradations from deep black to soft gray, rice-paper texture, minimalist composition. No text, letters, calligraphy, kanji, signatures, or red seal stamps unless explicitly required by the subject. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nAnime: Anime illustration, cel-shaded style, vibrant colors, clean linework, soft gradient backgrounds\nEditorial: Editorial illustration, conceptual art, bold geometric shapes, sophisticated color palette, negative space, minimalist composition, strong silhouette\nIsometric: Isometric 3D illustration, clean vector style, soft gradient background, matte pastel colors, simple geometric objects, no characters. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nClaymation: Claymation style, soft clay figurines, plasticine texture, handmade stop-motion aesthetic, warm studio lighting, shallow depth of field\nEducation: Educational infographic style, simple icons, pastel colors, white background. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nChalkboard: Simple, minimalist, white chalk line drawings on dark green chalkboard, hand-drawn sketch style, chalk dust texture. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nBoho: Simple graphic with only a few elements. Boho linocut poster. Textured organic strokes with crisp lines and a white textured background. A clear uncluttered subject centered in the frame, occupying only the middle half of the image, with generous empty margins on all four sides, no background clutter.\nPoster: Risograph print aesthetic, halftone texture, limited duotone palette, paper grain, high contrast, bold flat colors",
+            "type": "string",
+            "minLength": 1
+          },
+          "aspectRatio": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Aspect-ratio width unit (e.g. 16 for 16:9)."
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Aspect-ratio height unit (e.g. 9 for 16:9)."
+              }
+            },
+            "required": [
+              "width",
+              "height"
+            ],
+            "description": "Output aspect ratio as width:height units (not pixels). Example: { width: 16, height: 9 }."
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MAX"
+            ],
+            "description": "Image generation quality for scene opening frames. Optional; defaults to HIGH. Does not change video generation quality."
+          },
+          "autoExport": {
+            "description": "When true (the default), the run stays in progress until an MP4 is ready. Use downloadUrl from the result. Set false only if you will call remix_project and then export_project yourself.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "scenes"
+        ]
+      }
+  - name: list_projects
+    description: "List projects. API-created projects only by default; pass includeUiProjects to also include dashboard projects."
+    input_schema:
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor from a previous response's `nextCursor`.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to return.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 100
+          },
+          "selfOnly": {
+            "description": "When true, restrict results to items created by the API key owner rather than the whole team.",
+            "type": "boolean"
+          },
+          "includeUiProjects": {
+            "description": "Include projects created in the VideoGen dashboard, not just API-created ones.",
+            "type": "boolean"
+          }
+        }
+      }
+  - name: export_project
+    description: "Export a project to an MP4 and return its status or download URL. Renders often take a few minutes. Tell the user that wait up front."
+    input_schema:
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id to export."
+          },
+          "quality": {
+            "description": "Export quality. Omit for the default.",
+            "type": "string",
+            "enum": [
+              "STANDARD",
+              "HIGH",
+              "FULL_HIGH",
+              "ULTRA_HIGH"
+            ]
+          }
+        },
+        "required": [
+          "projectId"
+        ]
+      }
+resources:
+  - uri_template: "guidance://getting-started"
+    description: "How to authenticate, verify with get_me, introduce VideoGen with workflow example prompts, choose workflows vs media tools, and follow VideoGen id conventions. Call when connecting, onboarding, the user asks what VideoGen can do, or how to set up the API or MCP."
+  - uri_template: "guidance://async-tasks"
+    description: "How to handle async workflows, tool executions, and exports: statuses, hosted vs local wait caps, polling with get_* tools, and when webhooks apply outside MCP. Call before polling or when a start tool returns a still-running snapshot."
+  - uri_template: "guidance://workflows"
+    description: "Canonical run → remix → export flow and when to use each workflow tool. Prefer script_to_video for longer narrated / informational videos; keep storyboard_to_video to ≤3 scenes unless the user asks for more. Call before starting a full video project."
+  - uri_template: "guidance://tools-vs-workflows"
+    description: "When to use standalone media tools (automatic model routing for a single asset) versus workflows (full editable professional video). Call when choosing between generate_* tools and workflow tools."
+install:
+  url: https://mcp.videogen.io/mcp
+  npm: "@videogen/mcp"
+  command: npx
+  args:
+    - "-y"
+    - "@videogen/mcp@2.2.1"
+env_vars:
+  - name: VIDEOGEN_API_KEY
+    description: Required only for local stdio. Hosted HTTP uses OAuth or an Authorization Bearer header instead.
+    required: true
+license: MIT
+version: "2.2.1"
