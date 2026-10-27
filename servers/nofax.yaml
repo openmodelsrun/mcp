@@ -1,0 +1,130 @@
+id: nofax
+name: Nofax
+description: >
+  Human-in-the-loop approvals and notifications for AI coding agents. Nofax exposes
+  a local stdio MCP server for one-way notifications, durable approval, choice, and
+  refinement requests, explicit waiting for terminal human responses, and safe
+  request recovery. Pending requests never imply approval.
+author:
+  name: Tomi Šeregi
+  github: AKzar1el
+repository: https://github.com/AKzar1el/nofax
+transport:
+  - stdio
+category: Development
+tags:
+  - human-in-the-loop
+  - approval
+  - ai-agents
+  - developer-tools
+  - mcp
+  - notifications
+  - claude-code
+  - codex
+  - gemini-cli
+created_at: "2026-09-21T22:10:36.000Z"
+updated_at: "2026-09-24T14:30:39.053Z"
+tools:
+  - name: nofax_notify
+    description: Send a one-way phone notification without creating a human-response wait.
+    input_schema:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+      required:
+        - message
+  - name: nofax_request_approval
+    description: Request explicit Allow or Deny approval and return a durable pending request ID.
+    input_schema:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        allowRefine:
+          type: boolean
+      required:
+        - message
+  - name: nofax_request_choice
+    description: Ask the human to choose among up to three explicit options and return a durable pending request ID.
+    input_schema:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        options:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            oneOf:
+              - type: string
+              - type: object
+                properties:
+                  value:
+                    type: string
+                  label:
+                    type: string
+                required:
+                  - value
+                  - label
+      required:
+        - message
+        - options
+  - name: nofax_request_refinement
+    description: Ask the human for free-text refinement and return a durable pending request ID.
+    input_schema:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+      required:
+        - message
+  - name: nofax_wait_for_response
+    description: Long-poll a durable request; callers must keep waiting while the result is pending.
+    input_schema:
+      type: object
+      properties:
+        requestId:
+          type: string
+        waitSeconds:
+          type: integer
+          minimum: 1
+          maximum: 240
+      required:
+        - requestId
+  - name: nofax_get_request
+    description: Read safe metadata and terminal state for a durable request without exposing secret response topics.
+    input_schema:
+      type: object
+      properties:
+        requestId:
+          type: string
+      required:
+        - requestId
+  - name: nofax_list_pending
+    description: List a bounded set of unresolved request handles for recovery without exposing secret response topics.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+install:
+  npm: nofax
+  command: npx
+  args:
+    - "-y"
+    - nofax
+    - mcp
+license: MIT
+version: "0.2.43"
