@@ -1,0 +1,43 @@
+id: llmsmap-me
+name: llmsmap.me International Directory
+description: >
+  Read-only search and discovery for the international llms.txt directory maintained
+  by llmsmap.me. Use it to list approved AI-ready websites or search the catalog by
+  product name or URL; it returns public directory metadata only.
+author:
+  name: llmsmap.me Team
+  github: arseniigruzdev
+repository: https://github.com/arseniigruzdev/llmsmap-distribution
+transport:
+  - http-streaming
+category: Research
+tags:
+  - llms-txt
+  - ai-readiness
+  - website-directory
+  - search
+created_at: "2026-08-31T00:00:00.000Z"
+updated_at: "2026-08-31T00:00:00.000Z"
+tools:
+  - name: list_catalog
+    description: List approved international directory entries with llms.txt metadata.
+    input_schema:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: Maximum number of entries to return, up to 50.
+  - name: search_catalog
+    description: Search approved international directory entries by product name or URL.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Product name or URL to search for.
+        limit:
+          type: integer
+          description: Maximum number of matches to return, up to 50.
+      required:
+        - query
+version: "1.0.0"
