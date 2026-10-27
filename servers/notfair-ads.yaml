@@ -1,0 +1,33 @@
+id: notfair-ads
+name: NotFair Ads MCP
+description: >
+  Hosted OAuth MCP for AI agents working across Google Ads, Meta Ads, X Ads,
+  LinkedIn Ads, Google Analytics 4, Google Search Console, and GoHighLevel.
+  It exposes 282 tools for account discovery, cross-channel analysis, campaign
+  management, creative workflows, analytics, CRM operations, approval-gated
+  writes, change tracking, and guardrailed bulk mutations through one remote
+  Streamable HTTP endpoint. Use it when an agent needs live marketing data and
+  reviewable actions without installing or hosting a local MCP server.
+author:
+  name: NoWork Studio
+  github: nowork-studio
+repository: https://github.com/nowork-studio/notfair-plugin
+transport:
+  - http-streaming
+category: AI
+tags:
+  - marketing
+  - advertising
+  - google-ads
+  - meta-ads
+  - x-ads
+  - linkedin-ads
+  - analytics
+  - search-console
+  - crm
+  - oauth
+  - campaign-management
+created_at: "2026-08-26T00:00:00.000Z"
+updated_at: "2026-08-26T00:00:00.000Z"
+license: MIT
+version: "0.27.1"
