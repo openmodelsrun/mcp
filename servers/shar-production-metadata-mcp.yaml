@@ -1,0 +1,44 @@
+id: shar-production-metadata-mcp
+name: SHAR Production Metadata MCP
+description: >
+  A read-only MCP server that validates rights-aware production metadata manifests.
+  It checks required project metadata, production stage, and declared rights status,
+  then returns a releasability result. It does not read local files, call networks,
+  or publish data.
+author:
+  name: SHAR Production
+  github: SHARProduction
+repository: https://github.com/SHARProduction/production-metadata-mcp
+transport:
+  - stdio
+category: AI
+tags:
+  - production-metadata
+  - rights-aware
+  - metadata-validation
+  - video-production
+  - read-only
+created_at: "2026-09-09T00:00:00.000Z"
+updated_at: "2026-09-09T00:00:00.000Z"
+tools:
+  - name: validate_production_manifest
+    description: >
+      Validates project metadata, production stage, and declared rights status in a
+      manifest object, returning a releasability result and any validation errors.
+    input_schema:
+      type: object
+      properties:
+        manifest:
+          type: object
+          description: Production metadata manifest to validate.
+      required:
+        - manifest
+install:
+  npm: "@sharproduction/production-metadata-mcp"
+  command: npx
+  args:
+    - "-y"
+    - "@sharproduction/production-metadata-mcp"
+license: MIT
+version: "1.0.4"
+stars: 0
