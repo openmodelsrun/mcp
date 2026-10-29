@@ -1,0 +1,177 @@
+id: rea-captcha
+name: rea-captcha
+description: >
+  Local stdio MCP server and SDK for browser-agent verification gates. It can
+  analyze page evidence without browser control or, when explicitly configured
+  with a caller-owned Playwright/CDP session, coordinate authorized provider-test
+  and owned-origin actions or a bounded human handoff. The task resumes only
+  after fresh validation; third-party production challenges are not automated.
+author:
+  name: MASAKA AI
+  github: masakaai
+repository: https://github.com/masakaai/rea-captcha
+transport:
+  - stdio
+category: Browser Automation
+tags:
+  - browser-agents
+  - browser-use
+  - playwright
+  - captcha
+  - human-in-the-loop
+  - verification
+  - mcp
+  - testing
+created_at: "2026-10-15T23:18:59.000Z"
+updated_at: "2026-10-16T09:37:00.000Z"
+tools:
+  - name: captcha_analyze
+    description: >
+      Analyze URL, title, HTML, visible text, or runtime signals already captured
+      by the calling agent without controlling a browser session.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL of the page observed by the calling agent.
+        title:
+          type: string
+          maxLength: 2000
+          default: ""
+        html:
+          type: string
+          maxLength: 2000000
+        text:
+          type: string
+          maxLength: 500000
+        runtime_signals:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            maxLength: 2000
+      required:
+        - url
+      anyOf:
+        - required: [html]
+        - required: [text]
+        - required: [runtime_signals]
+  - name: captcha_inspect
+    description: >
+      Inspect a configured browser session for an active verification challenge
+      and return evidence plus the handling policy.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Configured browser session identifier.
+      required: [session_id]
+  - name: captcha_complete
+    description: >
+      Complete an authorized provider-test or owned-origin challenge in the
+      existing browser session, then wait for fresh server-validated evidence.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Configured browser session identifier.
+        timeout_ms:
+          type: integer
+          minimum: 1
+          maximum: 3600000
+          default: 120000
+        poll_ms:
+          type: integer
+          minimum: 25
+          maximum: 60000
+          default: 1000
+      required: [session_id]
+  - name: captcha_handoff
+    description: >
+      Bind the current challenge to a caller-owned task and mark it as awaiting a
+      person in the existing browser session without copying cookies or tokens.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Configured browser session identifier.
+        task_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Caller-owned task or run identifier for this handoff.
+      required: [session_id, task_id]
+  - name: captcha_wait
+    description: >
+      Poll the same browser session until fresh evidence shows that verification
+      cleared or the bounded timeout expires.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Configured browser session identifier.
+        timeout_ms:
+          type: integer
+          minimum: 1
+          maximum: 3600000
+          default: 120000
+        poll_ms:
+          type: integer
+          minimum: 25
+          maximum: 60000
+          default: 1000
+      required: [session_id]
+  - name: captcha_resume
+    description: >
+      Consume a matching handoff at most once, re-inspect the existing session,
+      and resume only after fresh clear or passed evidence.
+    input_schema:
+      type: object
+      additionalProperties: false
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Configured browser session identifier.
+        task_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Task identifier used for a human handoff. Supply with handoff_id.
+        handoff_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Opaque identifier returned by captcha_handoff. Supply with task_id.
+      required: [session_id]
+install:
+  npm: rea-captcha
+  command: npx
+  args:
+    - rea-captcha@0.3.0
+    - mcp
+    - --stateless
+env_vars: []
+license: MIT
+version: "0.3.0"
+stars: 1
