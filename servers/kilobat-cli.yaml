@@ -1,0 +1,42 @@
+id: kilobat-cli
+name: Kilobat CLI
+description: >-
+  GPL-3.0-only macOS CLI and local stdio MCP server for network monitoring and
+  diagnostics. Requires macOS 14 or newer and Xcode 16 or newer for the Homebrew
+  source build: brew install seifip/kilobat/kilobat. Run kilobat mcp after installation.
+  The menu-bar desktop app is a separate proprietary product; some Wi-Fi data
+  depends on it, and actions that change settings require user confirmation and
+  may require administrator authorization.
+author:
+  name: Philip Seifi
+  github: seifip
+repository: https://github.com/seifip/kilobat-cli
+transport:
+  - stdio
+category: DevOps
+tags:
+  - macos
+  - network-diagnostics
+  - monitoring
+  - cli
+created_at: "2026-10-30T17:28:53.000Z"
+updated_at: "2026-10-30T17:28:53.000Z"
+tools:
+  - name: get_status
+    description: Sample current per-app network traffic and connection status on this Mac.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+  - name: diagnose_network
+    description: Check connection health, including router and internet latency, DNS and captive portals.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+install:
+  command: kilobat
+  args:
+    - mcp
+license: GPL-3.0-only
+version: "0.10.0"
