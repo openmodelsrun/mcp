@@ -24,13 +24,12 @@ tags:
 - remote-mcp
 - oauth
 created_at: '2026-08-30T00:00:00.000Z'
-updated_at: '2026-10-24T17:21:22.322Z'
+updated_at: '2026-10-31T12:44:09.552932Z'
 tools:
-- name: workflow_guide_retrieve
-  description: Read Magic Hour workflow guidance for face swap, image editing, image-to-video, video generation,
-    lip sync, UGC ads, talking photos or API integration. Returns product and documentation URLs, exact tool names,
-    ordered steps, example requests, follow-up edits and review criteria; does not generate media, spend credits
-    or check account access.
+- name: get_workflow_guide
+  description: Returns required inputs, ordered steps, example requests and review criteria for eight
+    supported Magic Hour workflows. Use when planning a generation, not to run one. Requires authentication
+    but does not check account eligibility or spend credits.
   input_schema:
     additionalProperties: false
     properties:
@@ -49,16 +48,17 @@ tools:
     - workflow
     type: object
 - name: ping
-  description: Check that the Magic Hour MCP server is reachable.
+  description: Checks that the Magic Hour server is reachable. Use for connectivity troubleshooting; it
+    does not validate API credentials or account access. Makes no media or project changes.
   input_schema:
     additionalProperties: false
     properties: {}
     type: object
 - name: wait_for_video_project
-  description: Poll a video project until it completes, errors, is canceled, or times out. After a timeout, resume
-    with the same id; do not create another generation. Returns sanitized download fields. Use `exact_download_urls[n]`
-    or `downloads[n].url` exactly as returned; do not shorten it, remove query parameters, or append expiration
-    metadata. Inline previews share an 8 MiB limit; all download URLs remain available.
+  description: Polls a video project until it completes, errors, is canceled or times out. Use with the
+    id returned by a video create tool. Read-only; returns download URLs when complete. After a timeout,
+    resume with the same id rather than creating another generation. Use signed download URLs exactly
+    as returned. Does not inline video content.
   input_schema:
     additionalProperties: false
     properties:
@@ -80,11 +80,10 @@ tools:
     - id
     type: object
 - name: wait_for_image_project
-  description: Poll an image project until it completes, errors, is canceled, or times out. After a timeout, resume
-    with the same id; do not create another generation. Returns the final project JSON and, when complete, attempts
-    to inline image downloads for Inspector or compatible clients. Returns sanitized download fields. Use `exact_download_urls[n]`
-    or `downloads[n].url` exactly as returned; do not shorten it, remove query parameters, or append expiration
-    metadata. Inline previews share an 8 MiB limit; all download URLs remain available.
+  description: Polls an image project until it completes, errors, is canceled or times out. Use with the
+    id returned by an image create tool. Read-only; returns the project and download URLs, with optional
+    inline image previews sharing an 8 MiB total limit. After a timeout, resume with the same id rather
+    than creating another generation. Use signed download URLs exactly as returned.
   input_schema:
     additionalProperties: false
     properties:
@@ -109,11 +108,10 @@ tools:
     - id
     type: object
 - name: wait_for_audio_project
-  description: Poll an audio project until it completes, errors, is canceled, or times out. After a timeout, resume
-    with the same id; do not create another generation. Returns the final project JSON and, when complete, attempts
-    to inline audio downloads for Inspector or compatible clients. Returns sanitized download fields. Use `exact_download_urls[n]`
-    or `downloads[n].url` exactly as returned; do not shorten it, remove query parameters, or append expiration
-    metadata. Inline previews share an 8 MiB limit; all download URLs remain available.
+  description: Polls an audio project until it completes, errors, is canceled or times out. Use with the
+    id returned by an audio create tool. Read-only; returns the project and download URLs, with optional
+    inline audio previews sharing an 8 MiB total limit. After a timeout, resume with the same id rather
+    than creating another generation. Use signed download URLs exactly as returned.
   input_schema:
     additionalProperties: false
     properties:
@@ -138,10 +136,10 @@ tools:
     - id
     type: object
 - name: fetch_image_download
-  description: Fetch a image `downloads[n].url` from a completed image project and return it as inline MCP image
-    content for compatible clients. Pass the exact full signed URL from `downloads[n].url` without trimming query
-    parameters; `expires_at` is separate metadata, not part of the URL. Inline media is capped at 8 MiB; use the
-    signed URL directly for larger downloads.
+  description: Fetch a completed project's image as inline MCP image content for compatible clients. Use
+    the exact signed download URL, including query parameters. Requires HTTPS at the configured Magic
+    Hour media host. Read-only; limited to 8 MiB, or a smaller requested max_bytes. Use the signed URL
+    directly for larger files.
   input_schema:
     additionalProperties: false
     properties:
@@ -154,10 +152,10 @@ tools:
     - download_url
     type: object
 - name: fetch_audio_download
-  description: Fetch a audio `downloads[n].url` from a completed audio project and return it as inline MCP audio
-    content for compatible clients. Pass the exact full signed URL from `downloads[n].url` without trimming query
-    parameters; `expires_at` is separate metadata, not part of the URL. Inline media is capped at 8 MiB; use the
-    signed URL directly for larger downloads.
+  description: Fetch a completed project's audio as inline MCP audio content for compatible clients. Use
+    the exact signed download URL, including query parameters. Requires HTTPS at the configured Magic
+    Hour media host. Read-only; limited to 8 MiB, or a smaller requested max_bytes. Use the signed URL
+    directly for larger files.
   input_schema:
     additionalProperties: false
     properties:
@@ -170,10 +168,10 @@ tools:
     - download_url
     type: object
 - name: fetch_video_download
-  description: Fetch a video `downloads[n].url` from a completed video project and return it as an embedded MCP
-    binary resource for compatible clients. Pass the exact full signed URL from `downloads[n].url` without trimming
-    query parameters; `expires_at` is separate metadata, not part of the URL. Inline media is capped at 8 MiB; use
-    the signed URL directly for larger downloads.
+  description: Fetch a completed project's video as an embedded MCP binary resource for compatible clients.
+    Use the exact signed download URL, including query parameters. Requires HTTPS at the configured Magic
+    Hour media host. Read-only; limited to 8 MiB, or a smaller requested max_bytes. Use the signed URL
+    directly for larger files.
   input_schema:
     additionalProperties: false
     properties:
@@ -185,17 +183,18 @@ tools:
     required:
     - download_url
     type: object
-- name: account_retrieve
-  description: Get the current credit balance and subscription details of the account that owns the API key.
+- name: get_account_info
+  description: Returns credit balance and subscription details for the connected account. Use to inspect
+    account information before generation. Read-only; this is not a request-specific cost quote or model-eligibility
+    check.
   input_schema:
     type: object
     properties: {}
     required: []
-- name: saved_items_list
-  description: Returns active saved items owned by the authenticated account, newest first. Each item includes every
-    saved asset with a durable file_path for reuse in compatible generation APIs and a temporary signed URL for
-    previewing or downloading. Filter by type to find characters, references, voices, moodboards, or brand kits.
-    To fetch the next page, pass the response's next_cursor as cursor.
+- name: list_saved_items
+  description: Lists the account's active saved characters, references, voice recordings, moodboards and
+    brand kits, newest first. Reusable paths are in each item's assets[].file_path; temporary signed URLs
+    support preview/download. Read-only; pass next_cursor as cursor for the next page.
   input_schema:
     type: object
     properties:
@@ -221,32 +220,10 @@ tools:
         type: string
         description: Opaque pagination cursor from the previous response's next_cursor.
     required: []
-- name: video_assets_generate_presigned_url
-  description: 'MCP guidance:
-
-    - This only creates presigned upload URLs. For local files, upload the raw bytes to each returned `upload_url`
-    outside the generation call, then pass the matching `file_path` into the create tool.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Generates a list of pre-signed upload URLs for the assets required. This API is only necessary if you want to
-    upload to Magic Hour''s storage. Refer to the [Input Files Guide](https://docs.magichour.ai/integration/inputs-and-outputs)
-    for more details.
-
-
-    The response array will match the order of items in the request body.
-
-
-    **Valid file extensions per asset type**:
-
-    - video: mp4, m4v, mov, webm
-
-    - audio: mp3, wav, aac, flac, webm, weba, m4a, opus, ogg, oga, aiff, amr
-
-    - image: png, jpg, jpeg, jfif, heic...'
+- name: get_upload_urls
+  description: 'Creates presigned upload URL and file-path pairs for local media. Use when a generation
+    needs a file the user has locally: upload raw bytes to the returned upload_url, then pass its file_path
+    to the create tool. Does not upload file bytes or start a generation.'
   input_schema:
     type: object
     properties:
@@ -270,11 +247,11 @@ tools:
             extension:
               pattern: ^[a-z0-9]+$
               type: string
-              description: The extension of the file to upload. Do not include the dot (.) before the extension.
-                Possible extensions are mp4,m4v,mov,webm,mp3,wav,aac,flac,webm,weba,m4a,opus,ogg,oga,aiff,amr,png,jpg,jpeg,jfif,heic,heif,webp,avif,jp2,tiff,tif,bmp,gif,webp,webm
+              description: The extension of the file to upload. Do not include the dot (.) before the
+                extension. Possible extensions are mp4,m4v,mov,webm,mp3,wav,aac,flac,webm,weba,m4a,opus,ogg,oga,aiff,amr,png,jpg,jpeg,jpe,jfif,heic,heif,webp,avif,jp2,tiff,tif,bmp,gif,webp,webm
               example: mp4
-        description: The list of assets to upload. The response array will match the order of items in the request
-          body.
+        description: The list of assets to upload. The response array will match the order of items in
+          the request body.
         example:
         - type: video
           extension: mp4
@@ -282,11 +259,10 @@ tools:
           extension: mp3
     required:
     - items
-- name: face_detection_retrieve_details
-  description: "Get the details of a face detection task. \n\nUse this API to get the list of faces detected in\
-    \ the image or video to use in the [face swap photo](https://docs.magichour.ai/api-reference/image-projects/face-swap-photo)\
-    \ or [face swap video](https://docs.magichour.ai/api-reference/video-projects/face-swap-video) API calls for\
-    \ multi-face swaps."
+- name: get_face_detection_results
+  description: Returns a face-detection job's status and detected faces. Use with the id from detect_faces
+    to inspect progress and choose face mappings before a selected-face swap. Read-only; faces may populate
+    while processing.
   input_schema:
     type: object
     properties:
@@ -296,15 +272,11 @@ tools:
         description: The id of the task. This value is returned by the [face detection API](https://docs.magichour.ai/api-reference/files/face-detection#response-id).
     required:
     - id
-- name: face_detection_detect_faces
-  description: "MCP guidance:\n- This starts an async face-detection task and returns an `id`. Use the face-detection\
-    \ details endpoint with that id to retrieve detected faces before doing individual face swaps.\n- For `*_file_path`,\
-    \ use an existing Magic Hour path or the upload-URL endpoint's `file_path` after uploading raw bytes to its\
-    \ presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked URLs can\
-    \ fail. Prefer the upload-URL endpoint when unsure.\n\nDetect faces in an image or video. \n      \nUse this\
-    \ API to get the list of faces detected in the image or video to use in the [face swap photo](https://docs.magichour.ai/api-reference/image-projects/face-swap-photo)\
-    \ or [face swap video](https://docs.magichour.ai/api-reference/video-projects/face-swap-video) API calls for\
-    \ multi-face swaps.\n\nNote: Face detection is free to use for the near future. Pricing may change in the future."
+- name: detect_faces
+  description: Starts an asynchronous face-detection task for a supplied image or video and returns its
+    id and charge information. Use before a selected-face swap, then retrieve its status and detected
+    faces with get_face_detection_results. Current API documentation describes detection as free; pricing
+    may change.
   input_schema:
     type: object
     properties:
@@ -313,9 +285,9 @@ tools:
         maximum: 1.0
         minimum: 0.0
         type: number
-        description: "Confidence threshold for filtering detected faces. \n* Higher values (e.g., 0.9) include only\
-          \ faces detected with high certainty, reducing false positives. \n* Lower values (e.g., 0.3) include more\
-          \ faces, but may increase the chance of incorrect detections."
+        description: "Confidence threshold for filtering detected faces. \n* Higher values (e.g., 0.9)\
+          \ include only faces detected with high certainty, reducing false positives. \n* Lower values\
+          \ (e.g., 0.3) include more faces, but may increase the chance of incorrect detections."
         default: 0.5
         example: 0.5
       assets:
@@ -327,7 +299,7 @@ tools:
             type: string
             description: 'This is the image or video where the face will be detected. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -340,55 +312,40 @@ tools:
         description: Provide the assets for face detection
     required:
     - assets
-- name: video_projects_retrieve_details
-  description: "MCP guidance:\n- Use this after a create tool to poll job status. When status is `complete`, surface\
-    \ the `downloads` URLs to the user; if status is `error`, surface the error message.\n- Each `downloads[n].url`\
-    \ is already the full signed download URL. Use it exactly as returned. Do not shorten it, strip query parameters,\
-    \ or append `expires_at` onto the URL string.\n\nCheck the progress of a video project. The `downloads` field\
-    \ is populated after a successful render.\n  \n**Statuses**\n- `queued` — waiting to start\n- `rendering` —\
-    \ in progress\n- `complete` — ready; see `downloads`\n- `error` — a failure occurred (see `error`)\n- `canceled`\
-    \ — user canceled\n- `draft` — not used"
+- name: get_video_project
+  description: Returns a video project's status and, once complete, its download URLs. Use to check progress
+    with the id from a video create tool. Read-only.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the video project. This value is returned by all of the POST APIs that create
-          a video.
+        description: Unique ID of the video project. This value is returned by all of the POST APIs that
+          create a video.
     required:
     - id
-- name: video_projects_delete
-  description: Permanently delete the rendered video. This action is not reversible, please be sure before deleting.
+- name: delete_video_project
+  description: Deletes the video project and attempts to delete its completed output. Cannot be undone;
+    confirm with the user first.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the video project. This value is returned by all of the POST APIs that create
-          a video.
+        description: Unique ID of the video project. This value is returned by all of the POST APIs that
+          create a video.
     required:
     - id
-- name: ai_talking_photo_create_talking_photo
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: create_talking_photo
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Requires a still portrait in `assets.image_file_path` and an existing recording in `assets.audio_file_path`,
-    plus `start_seconds` and `end_seconds`. Text alone is not accepted; th...'
+    Animates a still portrait so it speaks an existing audio recording. Use with a portrait photo and
+    an audio file; text alone is not accepted and this tool does not synthesize speech. Starts a background
+    job that costs credits; returns a project id for wait_for_video_project.'
   input_schema:
     type: object
     properties:
@@ -401,14 +358,14 @@ tools:
         minimum: 0.0
         type: number
         description: 'The start time of the input audio in seconds. Maximum clip length depends on style.generation_mode:
-          realistic 300s, prompted 45s.'
+          realistic 300s, prompted 60s.'
         format: float
         example: 0
       end_seconds:
         minimum: 0.1
         type: number
         description: 'The end time of the input audio in seconds. Maximum clip length depends on style.generation_mode:
-          realistic 300s, prompted 45s.'
+          realistic 300s, prompted 60s.'
         format: float
         example: 5
       assets:
@@ -422,7 +379,7 @@ tools:
             type: string
             description: 'The source image to animate. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -437,7 +394,7 @@ tools:
             type: string
             description: 'The audio file to sync with the image. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -460,27 +417,15 @@ tools:
             - stable
             - expressive
             type: string
-            description: 'Controls overall motion style.
-
-              * `realistic` - Maintains likeness well, high quality, and reliable.
-
-              * `prompted` - Slightly lower likeness; allows option to prompt scene.
-
-
-              **Deprecated values (maintained for backward compatibility):**
-
-              * `pro` - Deprecated: use `realistic`
-
-              * `standard` - Deprecated: use `prompted`
-
-              * `stable` - Deprecated: use `realistic`
-
-              * `expressive` - Deprecated: use `prompted`'
+            description: 'Controls motion style. `realistic` animates the supplied portrait; `prompted`
+              also accepts a scene prompt. Deprecated aliases remain supported: `pro` and `stable` select
+              `realistic`; `standard` and `expressive` select `prompted`.'
             default: realistic
             example: realistic
           prompt:
             type: string
-            description: 'A text prompt to guide the generation. Only applicable when generation_mode is `prompted`.
+            description: 'A text prompt to guide the generation. Only applicable when generation_mode
+              is `prompted`.
 
               This field is ignored for other modes.'
             example: A person smiling and speaking naturally to the camera
@@ -490,29 +435,17 @@ tools:
         - 480p
         - 720p
         type: string
-        description: Output preset. Overrides `max_resolution`. Defaults to 480p in prompted mode; realistic mode
-          uses the mapped plan maximum.
+        description: Output preset. Overrides `max_resolution`. Defaults to 480p in prompted mode; realistic
+          mode uses the mapped plan maximum.
         example: 480p
     required:
     - start_seconds
     - end_seconds
     - assets
-- name: ai_ugc_ad_create_video
-  description: 'MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Create a spoken UGC video from a prepared image and script. Returns a project ID; poll GET /v1/video-projects/{id}
-    for status and downloads. To compose an image, generate the image separately with the Image Editor API and supply
-    its download URL.'
+- name: create_spoken_ad_video
+  description: Creates a creator-style spoken ad video from a prepared image and a text script. Use when
+    the image is ready and the dialogue should be generated from text. Starts a background job that costs
+    credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -526,7 +459,7 @@ tools:
             type: string
             description: 'Prepared image to animate. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -542,13 +475,13 @@ tools:
         type: string
         description: 'The words the actor should speak. Character limits apply after trimming:
 
-          * kling-3.0: 2500 characters.
+          * kling-3.0: 2304 characters.
 
           * ltx-2.5: 1804 characters.
 
           * veo3.1: 2500 characters.
 
-          LTX''s dialogue wrapper counts toward its model prompt limit.'
+          LTX and Kling dialogue wrappers count toward their model prompt limit.'
         example: Meet your new everyday essential.
       end_seconds:
         minimum: 1.0
@@ -559,7 +492,8 @@ tools:
 
           * ltx-2.5: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 seconds.
 
-          * veo3.1: 4, 6, 8, 15, 22, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92, 99, 106, 113, 120, 127, 134, 141 seconds.
+          * veo3.1: 4, 6, 8, 15, 22, 29, 36, 43, 50, 57, 64, 71, 78, 85, 92, 99, 106, 113, 120, 127, 134,
+          141 seconds.
 
           Free plans are limited to 5 seconds unless a credit pack has been purchased.'
         example: 4
@@ -576,23 +510,16 @@ tools:
         - 720p
         - 1080p
         type: string
-        description: Defaults to 720p on paid plans and 480p on free plans. Unsupported model/resolution combinations
-          and resolutions unavailable for your plan are rejected.
+        description: Defaults to 720p on paid plans and 480p on free plans. Unsupported model/resolution
+          combinations and resolutions unavailable for your plan are rejected.
     required:
     - assets
     - script
     - end_seconds
-- name: ai_video_editor_create_video
-  description: "MCP guidance:\n- Starts an async video job; returns `id` and `credits_charged`. For finished results,\
-    \ call `wait_for_video_project` with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`,\
-    \ or `canceled`. Results include `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and\
-    \ query parameters; never append expiration metadata.\n- For `*_file_path`, use an existing Magic Hour path\
-    \ or the upload-URL endpoint's `file_path` after uploading raw bytes to its presigned URL. Direct public media\
-    \ URLs may work if stable and fetchable as raw bytes; hotlinked URLs can fail. Prefer the upload-URL endpoint\
-    \ when unsure.\n\n**What this API does**\n\nCreate the same Video Editor you can make in the browser, but programmatically,\
-    \ so you can automate it, run it at scale, or connect it to your own app or workflow.\n    \n**Good for**\n\
-    - Automation and batch processing  \n- Adding video editor into apps, pipelines, or tools  \n\n**How it works\
-    \ (3 steps)**\n1) Upload your inp..."
+- name: edit_video
+  description: Edits the appearance or content of a supplied video segment using a text prompt. Use with
+    a source video, the requested changes and the clip end time. Starts a background job that costs credits;
+    returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -611,20 +538,20 @@ tools:
       end_seconds:
         minimum: 0.1
         type: number
-        description: 'End time of your clip in seconds. Must be greater than `start_seconds`. Minimum duration depends
-          on model: `gemini-omni-1.1`: 3s, LTX 2.5: 0.5s. Maximum duration depends on model: `gemini-omni-1.1`:
-          10s, LTX 2.5: 20s.'
+        description: 'End time of your clip in seconds. Must be greater than `start_seconds`. Minimum
+          duration depends on model: `gemini-omni-1.1`: 3s, LTX 2.5: 0.5s. Maximum duration depends on
+          model: `gemini-omni-1.1`: 10s, LTX 2.5: 60s (30s at 1080p).'
         format: float
         example: 5
       model:
         enum:
         - gemini-omni-1.1
-        - gemini-omni
         - ltx-2.5
+        - gemini-omni
         - ltx-2.3
         type: string
-        description: Editing model. Defaults to LTX 2.5 for free tier and `gemini-omni-1.1` for paid. `gemini-omni`
-          is deprecated; use `gemini-omni-1.1` instead.
+        description: Editing model. Defaults to LTX 2.5 for free tier and `gemini-omni-1.1` for paid.
+          `gemini-omni` is deprecated; use `gemini-omni-1.1` instead.
         example: ltx-2.5
       resolution:
         enum:
@@ -655,7 +582,7 @@ tools:
             type: string
             description: 'The video to edit. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -670,17 +597,9 @@ tools:
     - end_seconds
     - style
     - assets
-- name: ai_video_translator_create_video
-  description: "MCP guidance:\n- Starts an async video job; returns `id` and `credits_charged`. For finished results,\
-    \ call `wait_for_video_project` with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`,\
-    \ or `canceled`. Results include `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and\
-    \ query parameters; never append expiration metadata.\n- For `*_file_path`, use an existing Magic Hour path\
-    \ or the upload-URL endpoint's `file_path` after uploading raw bytes to its presigned URL. Direct public media\
-    \ URLs may work if stable and fetchable as raw bytes; hotlinked URLs can fail. Prefer the upload-URL endpoint\
-    \ when unsure.\n\n**What this API does**\n\nCreate the same Video Translator you can make in the browser, but\
-    \ programmatically, so you can automate it, run it at scale, or connect it to your own app or workflow.\n  \
-    \  \n**Good for**\n- Automation and batch processing  \n- Adding video translator into apps, pipelines, or tools\
-    \  \n\n**How it works (3 steps)**\n1) Upload ..."
+- name: translate_video
+  description: Translates speech in a supplied video segment into a supported target language. Starts
+    a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -699,8 +618,8 @@ tools:
       end_seconds:
         minimum: 0.1
         type: number
-        description: End time of your clip (seconds). Must be greater than start_seconds. The clip must be 1-30
-          seconds long.
+        description: End time of your clip (seconds). Must be greater than start_seconds. The clip must
+          be 1-30 seconds long.
         format: float
         example: 5
       target_language:
@@ -779,7 +698,7 @@ tools:
             type: string
             description: 'Source video containing the speech to translate. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -794,17 +713,9 @@ tools:
     - end_seconds
     - target_language
     - assets
-- name: ai_video_upscaler_create_video
-  description: "MCP guidance:\n- Starts an async video job; returns `id` and `credits_charged`. For finished results,\
-    \ call `wait_for_video_project` with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`,\
-    \ or `canceled`. Results include `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and\
-    \ query parameters; never append expiration metadata.\n- For `*_file_path`, use an existing Magic Hour path\
-    \ or the upload-URL endpoint's `file_path` after uploading raw bytes to its presigned URL. Direct public media\
-    \ URLs may work if stable and fetchable as raw bytes; hotlinked URLs can fail. Prefer the upload-URL endpoint\
-    \ when unsure.\n\n**What this API does**\n\nCreate the same Video Upscaler you can make in the browser, but\
-    \ programmatically, so you can automate it, run it at scale, or connect it to your own app or workflow.\n  \
-    \  \n**Good for**\n- Automation and batch processing  \n- Adding video upscaler into apps, pipelines, or tools\
-    \  \n\n**How it works (3 steps)**\n1) Upload your..."
+- name: upscale_video
+  description: Upscales a supplied video segment to a selected output resolution while preserving its
+    aspect ratio. Starts a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -833,8 +744,8 @@ tools:
         - 2k
         - 4k
         type: string
-        description: Output resolution. `720p` and `1080p` set the output's short side, `2k` and `4k` its long side;
-          the aspect ratio is kept. Requires a paid plan.
+        description: Output resolution. `720p` and `1080p` set the output's short side, `2k` and `4k`
+          its long side; the aspect ratio is kept. Requires a paid plan.
         example: 1080p
       assets:
         required:
@@ -846,7 +757,7 @@ tools:
             type: string
             description: 'Video to upscale. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -861,20 +772,10 @@ tools:
     - end_seconds
     - resolution
     - assets
-- name: animation_create_video
-  description: 'MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Create a Animation video. The estimated frame cost is calculated based on the `fps` and `end_seconds` input.'
+- name: create_animation
+  description: Creates a stylized animated video with art and camera settings, using a custom prompt or
+    an audio-derived prompt mode. Can use an initial image and audio. Credits depend on frame rate and
+    duration; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -897,14 +798,14 @@ tools:
       height:
         minimum: 64.0
         type: integer
-        description: The height of the final output video. The maximum height depends on your subscription. Please
-          refer to our [pricing page](https://magichour.ai/pricing) for more details
+        description: The height of the final output video. The maximum height depends on your subscription.
+          Please refer to our [pricing page](https://magichour.ai/pricing) for more details
         example: 512
       width:
         minimum: 64.0
         type: integer
-        description: The width of the final output video. The maximum width depends on your subscription. Please
-          refer to our [pricing page](https://magichour.ai/pricing) for more details
+        description: The width of the final output video. The maximum width depends on your subscription.
+          Please refer to our [pricing page](https://magichour.ai/pricing) for more details
         example: 512
       style:
         required:
@@ -1037,23 +938,23 @@ tools:
 
               * `custom` - Use your own prompt for the video.
 
-              * `use_lyrics` - Use the lyrics of the audio to create the prompt. If this option is selected, then
-              `assets.audio_source` must be `file` or `youtube`.
+              * `use_lyrics` - Use the lyrics of the audio to create the prompt. If this option is selected,
+              then `assets.audio_source` must be `file` or `youtube`.
 
-              * `ai_choose` - Let AI write the prompt. If this option is selected, then `assets.audio_source` must
-              be `file` or `youtube`.'
+              * `ai_choose` - Let AI write the prompt. If this option is selected, then `assets.audio_source`
+              must be `file` or `youtube`.'
             example: custom
           prompt:
             type: string
-            description: The prompt used for the video. Prompt is required if `prompt_type` is `custom`. Otherwise
-              this value is ignored
+            description: The prompt used for the video. Prompt is required if `prompt_type` is `custom`.
+              Otherwise this value is ignored
             example: Cyberpunk city
           transition_speed:
             maximum: 10.0
             minimum: 1.0
             type: integer
-            description: "Change determines how quickly the video's content changes across frames. \n* Higher =\
-              \ more rapid transitions.\n* Lower = more stable visual experience."
+            description: "Change determines how quickly the video's content changes across frames. \n\
+              * Higher = more rapid transitions.\n* Lower = more stable visual experience."
             example: 5
         description: Defines the style of the output video
       assets:
@@ -1072,10 +973,10 @@ tools:
           audio_file_path:
             minLength: 1
             type: string
-            description: 'The path of the input audio. This field is required if `audio_source` is `file`. This
-              value is either
+            description: 'The path of the input audio. This field is required if `audio_source` is `file`.
+              This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1088,15 +989,15 @@ tools:
           youtube_url:
             minLength: 1
             type: string
-            description: Using a youtube video as the input source. This field is required if `audio_source` is
-              `youtube`
+            description: Using a youtube video as the input source. This field is required if `audio_source`
+              is `youtube`
             format: uri
           image_file_path:
             minLength: 1
             type: string
             description: 'An initial image to use a the first frame of the video. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1118,17 +1019,9 @@ tools:
     - width
     - style
     - assets
-- name: audio_to_video_create_video
-  description: "MCP guidance:\n- Starts an async video job; returns `id` and `credits_charged`. For finished results,\
-    \ call `wait_for_video_project` with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`,\
-    \ or `canceled`. Results include `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and\
-    \ query parameters; never append expiration metadata.\n- For `*_file_path`, use an existing Magic Hour path\
-    \ or the upload-URL endpoint's `file_path` after uploading raw bytes to its presigned URL. Direct public media\
-    \ URLs may work if stable and fetchable as raw bytes; hotlinked URLs can fail. Prefer the upload-URL endpoint\
-    \ when unsure.\n\n**What this API does**\n\nCreate the same Audio To Video you can make in the browser, but\
-    \ programmatically, so you can automate it, run it at scale, or connect it to your own app or workflow.\n  \
-    \  \n**Good for**\n- Automation and batch processing  \n- Adding audio to video into apps, pipelines, or tools\
-    \  \n\n**How it works (3 steps)**\n1) Upload your..."
+- name: create_video_from_audio
+  description: Generates an audio-guided video from a supplied audio track, with an optional starting
+    image and visual prompt. Starts a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -1168,7 +1061,7 @@ tools:
             type: string
             description: 'The path of the audio file. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1183,7 +1076,7 @@ tools:
             type: string
             description: 'Reference image for the initial frame of the video. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1205,20 +1098,9 @@ tools:
     required:
     - end_seconds
     - assets
-- name: auto_subtitle_generator_create_video
-  description: 'MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Automatically generate subtitles for your video in multiple languages.'
+- name: add_subtitles_to_video
+  description: Adds automatically generated subtitles to a supplied video segment using a subtitle preset
+    or custom text styling. Starts a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -1249,7 +1131,7 @@ tools:
             type: string
             description: 'This is the video used to add subtitles. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1278,14 +1160,14 @@ tools:
             properties:
               font:
                 type: string
-                description: "Font name from Google Fonts. Not all fonts support all languages or character sets.\
-                  \ \nWe recommend verifying language support and appearance directly on https://fonts.google.com\
+                description: "Font name from Google Fonts. Not all fonts support all languages or character\
+                  \ sets. \nWe recommend verifying language support and appearance directly on https://fonts.google.com\
                   \ before use."
                 example: Noto Sans
               font_size:
                 type: number
-                description: Font size in pixels. If not provided, the font size is automatically calculated based
-                  on the video resolution.
+                description: Font size in pixels. If not provided, the font size is automatically calculated
+                  based on the video resolution.
                 example: 24
               font_style:
                 type: string
@@ -1317,36 +1199,25 @@ tools:
                 description: Horizontal alignment of the text (e.g., left, center, right)
                 example: center
             description: Custom subtitle configuration.
-        description: "Style of the subtitle. At least one of `.style.template` or `.style.custom_config` must be\
-          \ provided. \n* If only `.style.template` is provided, default values for the template will be used.\n\
-          * If both are provided, the fields in `.style.custom_config` will be used to overwrite the fields in `.style.template`.\n\
-          * If only `.style.custom_config` is provided, then all fields in `.style.custom_config` will be used.\n\
-          \nTo use custom config only, the following `custom_config` params are required:\n* `.style.custom_config.font`\n\
-          * `.style.custom_config.text_color`\n* `.style.custom_config.vertical_position`\n* `.style.custom_config.horizontal_position`\n"
+        description: "Style of the subtitle. At least one of `.style.template` or `.style.custom_config`\
+          \ must be provided. \n* If only `.style.template` is provided, default values for the template\
+          \ will be used.\n* If both are provided, the fields in `.style.custom_config` will be used to\
+          \ overwrite the fields in `.style.template`.\n* If only `.style.custom_config` is provided,\
+          \ then all fields in `.style.custom_config` will be used.\n\nTo use custom config only, the\
+          \ following `custom_config` params are required:\n* `.style.custom_config.font`\n* `.style.custom_config.text_color`\n\
+          * `.style.custom_config.vertical_position`\n* `.style.custom_config.horizontal_position`\n"
     required:
     - start_seconds
     - end_seconds
     - assets
     - style
-- name: character_replace_create_video
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: replace_character_in_video
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Replace a video subject or transfer video motion onto a reference character image. Requires `assets.video_file_path`,
-    `assets.image_file_path` and `end_seconds`. Model support con...'
+    Replaces a subject in a video with a character from a reference image, or transfers the video''s motion
+    onto that character. Starts a background job that costs credits; returns a project id for wait_for_video_project.'
   input_schema:
     type: object
     properties:
@@ -1372,14 +1243,19 @@ tools:
         enum:
         - wan-animate
         - kling-3.0
+        - minimax-h3
         type: string
         description: 'Model to use. Defaults to `wan-animate`.
 
 
           * **`wan-animate`**: 480p, 720p. Supports `points` subject selection.
 
-          * **`kling-3.0`**: 720p, 1080p. Clips of 3–10 seconds in `replace` mode or 3–30 seconds in `animate` mode.
-          Picks the main person automatically, so `points` are rejected.'
+          * **`kling-3.0`**: 720p, 1080p. Clips of 3–10 seconds in `replace` mode or 3–30 seconds in `animate`
+          mode. Picks the main person automatically, so `points` are rejected.
+
+          * **`minimax-h3`**: 480p, 720p, 1080p. Clips of 1–60 seconds in `replace` mode or 1–60 seconds
+          in `animate` mode. Subject `points` are `replace`-only; `animate` with `selection_mode` `point`
+          returns 422, and with `auto` or no `selection_mode` the points are ignored.'
         default: wan-animate
         example: wan-animate
       resolution:
@@ -1388,8 +1264,8 @@ tools:
         - 720p
         - 1080p
         type: string
-        description: Output video resolution. Must be supported by `model`. Defaults to the lowest resolution available
-          on your plan for that model.
+        description: Output video resolution. Must be supported by `model`. Defaults to the lowest resolution
+          available on your plan for that model.
         example: 480p
       assets:
         required:
@@ -1402,7 +1278,7 @@ tools:
             type: string
             description: 'Source video containing the subject to replace or animate. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1415,9 +1291,10 @@ tools:
           image_file_path:
             minLength: 1
             type: string
-            description: 'Reference character image used as the replacement or animation target. This value is either
+            description: 'Reference character image used as the replacement or animation target. This
+              value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1436,16 +1313,23 @@ tools:
             - replace
             - animate
             type: string
-            description: Processing mode. `replace` swaps the detected subject with your reference character. `animate`
-              transfers motion from the video onto your character image.
+            description: Processing mode. `replace` swaps the detected subject with your reference character.
+              `animate` transfers motion from the video onto your character image.
             example: replace
+          prompt:
+            maxLength: 2000
+            type: string
+            description: Optional direction. Supported by kling-3.0, minimax-h3.
           selection_mode:
             enum:
             - auto
             - point
             type: string
-            description: How to locate the subject in the source video. `auto` detects a person automatically. `point`
-              uses your `points` to mark the subject and is supported by `wan-animate`. Defaults to `auto`.
+            description: How to locate the subject in the source video. `auto` detects a person automatically.
+              `point` uses your `points` to mark the subject and is supported by `wan-animate`, `minimax-h3`.
+              `minimax-h3` subject `points` are `replace`-only; `animate` with `selection_mode` `point`
+              returns 422, and with `auto` or no `selection_mode` the points are ignored. Defaults to
+              `auto`.
             example: auto
           points:
             type: array
@@ -1459,25 +1343,27 @@ tools:
                 position_x:
                   minimum: 0.0
                   type: integer
-                  description: Horizontal pixel coordinate in the source video frame at `time_seconds`, measured
-                    from the left edge.
+                  description: Horizontal pixel coordinate in the source video frame at `time_seconds`,
+                    measured from the left edge.
                   example: 320
                 position_y:
                   minimum: 0.0
                   type: integer
-                  description: Vertical pixel coordinate in the source video frame at `time_seconds`, measured from
-                    the top edge.
+                  description: Vertical pixel coordinate in the source video frame at `time_seconds`,
+                    measured from the top edge.
                   example: 180
                 time_seconds:
                   minimum: 0.0
                   type: number
-                  description: Timestamp on the source video timeline in seconds. Uses the same clock as `start_seconds`
-                    and `end_seconds`.
+                  description: Timestamp on the source video timeline in seconds. Uses the same clock
+                    as `start_seconds` and `end_seconds`.
                   format: float
                   example: 2.5
-            description: On-frame markers for manual subject selection. Required when `selection_mode` is `point`.
-              Ignored when `selection_mode` is `auto` or omitted. Rejected for models without subject selection
-              (supported by `wan-animate`).
+            description: On-frame markers for manual subject selection. Required when `selection_mode`
+              is `point`. Ignored when `selection_mode` is `auto` or omitted. Rejected for models without
+              subject selection (supported by `wan-animate`, `minimax-h3`). `minimax-h3` subject `points`
+              are `replace`-only; `animate` with `selection_mode` `point` returns 422, and with `auto`
+              or no `selection_mode` the points are ignored.
         description: Optional style controls for replace vs animate mode and subject selection.
         example:
           mode: replace
@@ -1485,25 +1371,13 @@ tools:
     required:
     - end_seconds
     - assets
-- name: face_swap_create_video
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: swap_face_in_video
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Requires `start_seconds`, `end_seconds` and `assets.video_source` with its matching `assets.video_file_path`
-    or `assets.youtube_url`. Use `assets.image_file_path` for all-faces mo...'
+    Swaps faces in an existing video: all faces with a reference image, or selected faces using detect_faces
+    results. Starts a background job that costs credits; returns a project id for wait_for_video_project.'
   input_schema:
     type: object
     properties:
@@ -1533,12 +1407,8 @@ tools:
             - v2
             - default
             type: string
-            description: '* `v1` - May preserve skin detail and texture better, but weaker identity preservation.
-
-              * `v2` - Faster, sharper, better handling of hair and glasses. stronger identity preservation.
-
-              * `default` - Use the version we recommend, which will change over time. This is recommended unless
-              you need a specific earlier version. This is the default behavior.'
+            description: Select face-swap version `v1` or `v2`. `default` uses the server-selected version,
+              which may change over time.
             example: default
         description: Style of the face swap video.
         example:
@@ -1553,23 +1423,19 @@ tools:
             - all-faces
             - individual-faces
             type: string
-            description: 'Choose how to swap faces:
-
-              - **all-faces** (recommended) — swap all detected faces using one source image (`source_file_path`
-              required)
-
-              - **individual-faces** — specify exact mappings using `face_mappings`'
+            description: Choose which faces to swap. `all-faces` uses one source image for all detected
+              faces (`image_file_path` required). `individual-faces` uses exact `face_mappings`.
             default: all-faces
             example: all-faces
           image_file_path:
             type: string
-            description: 'The path of the input image with the face to be swapped.  The value is required if `face_swap_mode`
-              is `all-faces`.
+            description: 'The path of the input image with the face to be swapped.  The value is required
+              if `face_swap_mode` is `all-faces`.
 
 
               This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1590,23 +1456,23 @@ tools:
               properties:
                 original_face:
                   type: string
-                  description: 'The face detected from the image in `target_file_path`. The file name is in the
-                    format of `<face_frame>-<face_index>.png`. This value is corresponds to the response in the
-                    [face detection API](https://docs.magichour.ai/api-reference/files/get-face-detection-details).
+                  description: 'The face detected from the image in `target_file_path`. The file name
+                    is in the format of `<face_frame>-<face_index>.png`. This value is corresponds to
+                    the response in the [face detection API](https://docs.magichour.ai/api-reference/files/get-face-detection-details).
 
 
-                    * The face_frame is the frame number of the face in the target image. For images, the frame
-                    number is always 0.
+                    * The face_frame is the frame number of the face in the target image. For images,
+                    the frame number is always 0.
 
-                    * The face_index is the index of the face in the target image, starting from 0 going left to
-                    right.'
+                    * The face_index is the index of the face in the target image, starting from 0 going
+                    left to right.'
                   example: api-assets/id/0-0.png
                 new_face:
                   type: string
-                  description: 'The face image that will be used to replace the face in the `original_face`. This
-                    value is either
+                  description: 'The face image that will be used to replace the face in the `original_face`.
+                    This value is either
 
-                    - a direct URL to the video file
+                    - a direct URL to the file. The URL path must end in a supported file extension.
 
                     - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1616,8 +1482,8 @@ tools:
 
                     '
                   example: api-assets/id/1234.png
-            description: This is the array of face mappings used for multiple face swap. The value is required if
-              `face_swap_mode` is `individual-faces`.
+            description: This is the array of face mappings used for multiple face swap. The value is
+              required if `face_swap_mode` is `individual-faces`.
             example:
             - original_face: api-assets/id/0-0.png
               new_face: api-assets/id/1234.png
@@ -1632,7 +1498,7 @@ tools:
             type: string
             description: 'Your video file. Required if `video_source` is `file`. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1646,8 +1512,8 @@ tools:
             type: string
             description: YouTube URL (required if `video_source` is `youtube`).
             format: uri
-        description: Provide the assets for face swap. For video, The `video_source` field determines whether `video_file_path`
-          or `youtube_url` field is used
+        description: Provide the assets for face swap. For video, The `video_source` field determines
+          whether `video_file_path` or `youtube_url` field is used
         example:
           face_swap_mode: all-faces
           image_file_path: api-assets/id/1234.png
@@ -1657,23 +1523,9 @@ tools:
     - start_seconds
     - end_seconds
     - assets
-- name: image_to_video_create_video
-  description: 'MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Animate a supplied product photo, portrait or scene. Requires `assets.image_file_path` and `end_seconds`. Use
-    the approved image directly; edit only for a requested visual change or a source problem that prevents the shot.
-    Prompt for motion while preserving the supplied appearance. Model, duration, resolution and audio support vary.
-    Generati...'
+- name: create_video_from_image
+  description: Animates a supplied image into a video using motion instructions and available model options.
+    Starts a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -1686,8 +1538,8 @@ tools:
         maximum: 60.0
         minimum: 1.0
         type: number
-        description: 'The total duration of the output video in seconds. Supported durations depend on the chosen
-          model:
+        description: 'The total duration of the output video in seconds. Supported durations depend on
+          the chosen model:
 
 
           * **`gemini-omni-1.1`**: any integer from 3 to 10
@@ -1747,43 +1599,9 @@ tools:
         - kling-2.5-audio
         - veo3.1-audio
         type: string
-        description: 'The AI model to use for video generation.
-
-
-          * `default`: uses our currently recommended model for general use. For paid tiers, defaults to `kling-3.0`.
-          For free tiers, it defaults to `ltx-2.5`.
-
-          * `gemini-omni-1.1`: Best for precise short clips, first/last frames, and high-resolution output.
-
-          * `kling-2.6`: Best for action, motion blur, and controlled camera moves.
-
-          * `kling-3.0`: Best for cinematic stories, references, and optional audio.
-
-          * `ltx-2.5`: Fastest for general scenes, long clips, audio, and rapid iteration.
-
-          * `minimax-h3`: Great for reference-driven clips with native audio and longer durations.
-
-          * `seedance-1.5`: Best for smooth, consistent motion with an end frame.
-
-          * `seedance-2.0`: Best for reference-led clips with precise subject control.
-
-          * `seedance-2.0-fast`: Fast reference-led clips with consistent motion and audio.
-
-          * `seedance-2.0-mini`: Faster reference-led clips with consistent motion and audio.
-
-          * `seedance-2.5`: Best for premium realism, detail, and natural motion.
-
-          * `veo3.1`: Best for romantic interactions and expressive action, with realistic detail.
-
-          * `veo3.1-lite`: Balanced realism and audio at a lower cost than Veo 3.1.
-
-          * `wan-2.2`: Best for physical motion, action, and camera movement.
-
-          * `wan-3.0`: High-quality video with native audio, long clips, and end-frame control.
-
-
-          If you specify the deprecated model value that includes the `-audio` suffix, this will be the same as
-          included `audio` as `true`.'
+        description: The video generation model. With `default`, paid tiers use `kling-3.0` and Free uses
+          `ltx-2.5`. Duration, resolution, audio and reference support depend on the selected model. Deprecated
+          model values ending in `-audio` enable `audio`.
         default: default
         example: ltx-2.5
       resolution:
@@ -1794,8 +1612,8 @@ tools:
         - 1080p
         - 4k
         type: string
-        description: 'Controls the output video resolution. Defaults to `720p` on paid tiers and `480p` on free
-          tiers.
+        description: 'Controls the output video resolution. Defaults to `720p` on paid tiers and `480p`
+          on free tiers.
 
 
           * **`gemini-omni-1.1`**: Supports 360p, 720p, 1080p, 4k.
@@ -1883,7 +1701,7 @@ tools:
             type: string
             description: 'The path of the image file. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -1927,31 +1745,31 @@ tools:
 
               * **`wan-3.0`**: Supports 480p, 720p, 1080p.
 
+
+              This value is either
+
+              - a direct URL to the file. The URL path must end in a supported file extension.
+
+              - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
+
+
+              See the [file upload guide](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls#input-file)
+              for details.
+
               '
             example: api-assets/id/1234.png
         description: Provide the assets for image-to-video.
     required:
     - end_seconds
     - assets
-- name: lip_sync_create_video
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: create_lip_sync_video
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Match existing video to replacement audio. Requires `assets.audio_file_path`, `assets.video_source` and its
-    matching `assets.video_file_path` or `assets.youtube_url`, plus `start_...'
+    Adjusts an existing video''s lip movements to match supplied replacement audio. For a still portrait
+    plus audio, use create_talking_photo. Starts a background job that costs credits; returns a project
+    id for wait_for_video_project.'
   input_schema:
     type: object
     properties:
@@ -1975,9 +1793,9 @@ tools:
       max_fps_limit:
         minimum: 1.0
         type: number
-        description: Defines the maximum FPS (frames per second) for the output video. If the input video's FPS
-          is lower than this limit, the output video will retain the input FPS. This is useful for reducing unnecessary
-          frame usage in scenarios where high FPS is not required.
+        description: Defines the maximum FPS (frames per second) for the output video. If the input video's
+          FPS is lower than this limit, the output video will retain the input FPS. This is useful for
+          reducing unnecessary frame usage in scenarios where high FPS is not required.
         example: 12
       assets:
         required:
@@ -1990,7 +1808,7 @@ tools:
             type: string
             description: 'The path of the audio file. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2011,7 +1829,7 @@ tools:
             type: string
             description: 'Your video file. Required if `video_source` is `file`. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2025,8 +1843,8 @@ tools:
             type: string
             description: YouTube URL (required if `video_source` is `youtube`).
             format: uri
-        description: Provide the assets for lip-sync. For video, The `video_source` field determines whether `video_file_path`
-          or `youtube_url` field is used
+        description: Provide the assets for lip-sync. For video, The `video_source` field determines whether
+          `video_file_path` or `youtube_url` field is used
         example:
           audio_file_path: api-assets/id/1234.mp3
           video_source: file
@@ -2040,15 +1858,11 @@ tools:
             - standard
             - pro
             type: string
-            description: "A specific version of our lip sync system, optimized for different needs.\n* `lite` -\
-              \  Fast lip sync - best for simple videos. Costs 1 credit per frame of video.\n* `standard` -  Natural,\
-              \ accurate lip sync - best for most creators. Requires visible mouth movement in the opening seconds\
-              \ of the input video. Costs 1 credit per frame of video.\n* `pro` -  Premium fidelity with enhanced\
-              \ detail - best for professionals. Requires visible mouth movement in the opening seconds of the input\
-              \ video. Costs 2 credits per frame of video.\n\nIf your source is a still image, including a still\
-              \ image saved as a static video, use [AI Talking Photo](https://docs.magichour.ai/api-reference/video-projects/ai-talking-photo)\
-              \ with the original image and your audio instead.\n\nNote: `pro` is only available for users on Creator,\
-              \ Pro, and Business tiers.\n              "
+            description: Select the lip-sync mode. `lite` costs 1 credit per video frame. `standard` costs
+              1 credit per video frame; `pro` costs 2. Both `standard` and `pro` require visible mouth
+              movement in the opening seconds of the input video. `pro` requires a Creator, Pro or Business
+              tier. For a still image, including a static image saved as video, use `create_talking_photo`
+              with the original image and audio.
             default: lite
             example: lite
         description: Attributes used to dictate the style of the output
@@ -2056,17 +1870,10 @@ tools:
     - start_seconds
     - end_seconds
     - assets
-- name: text_to_video_create_video
-  description: 'MCP guidance:
-
-    - Starts an async video job; returns `id` and `credits_charged`. For finished results, call `wait_for_video_project`
-    with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Generate a new scene from `style.prompt` and `end_seconds` when no supplied starting image is required. To animate
-    an approved product photo or portrait, use `image_to_video_create_video` instead.'
+- name: create_video_from_text
+  description: Generates a video from a text prompt, with optional supported reference inputs and model
+    settings. To animate an existing starting image, use create_video_from_image. Starts a background
+    job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -2079,8 +1886,8 @@ tools:
         maximum: 60.0
         minimum: 1.0
         type: number
-        description: 'The total duration of the output video in seconds. Supported durations depend on the chosen
-          model:
+        description: 'The total duration of the output video in seconds. Supported durations depend on
+          the chosen model:
 
 
           * **`gemini-omni-1.1`**: any integer from 3 to 10
@@ -2120,8 +1927,8 @@ tools:
         - '9:16'
         - '1:1'
         type: string
-        description: 'Provide `aspect_ratio` to set the video’s aspect ratio. Determines the aspect ratio of the
-          output video.
+        description: 'Provide `aspect_ratio` to set the video’s aspect ratio. Determines the aspect ratio
+          of the output video.
 
 
           * **`gemini-omni-1.1`**: Supports 16:9, 9:16.
@@ -2162,8 +1969,8 @@ tools:
         - 1080p
         - 4k
         type: string
-        description: 'Controls the output video resolution. Defaults to `720p` on paid tiers and `480p` on free
-          tiers.
+        description: 'Controls the output video resolution. Defaults to `720p` on paid tiers and `480p`
+          on free tiers.
 
 
           * **`gemini-omni-1.1`**: Supports 360p, 720p, 1080p, 4k.
@@ -2222,43 +2029,9 @@ tools:
         - kling-2.5-audio
         - veo3.1-audio
         type: string
-        description: 'The AI model to use for video generation.
-
-
-          * `default`: uses our currently recommended model for general use. For paid tiers, defaults to `kling-3.0`.
-          For free tiers, it defaults to `ltx-2.5`.
-
-          * `gemini-omni-1.1`: Best for precise short clips, first/last frames, and high-resolution output.
-
-          * `kling-2.6`: Best for action, motion blur, and controlled camera moves.
-
-          * `kling-3.0`: Best for cinematic stories, references, and optional audio.
-
-          * `ltx-2.5`: Fastest for general scenes, long clips, audio, and rapid iteration.
-
-          * `minimax-h3`: Great for reference-driven clips with native audio and longer durations.
-
-          * `seedance-1.5`: Best for smooth, consistent motion with an end frame.
-
-          * `seedance-2.0`: Best for reference-led clips with precise subject control.
-
-          * `seedance-2.0-fast`: Fast reference-led clips with consistent motion and audio.
-
-          * `seedance-2.0-mini`: Faster reference-led clips with consistent motion and audio.
-
-          * `seedance-2.5`: Best for premium realism, detail, and natural motion.
-
-          * `veo3.1`: Best for romantic interactions and expressive action, with realistic detail.
-
-          * `veo3.1-lite`: Balanced realism and audio at a lower cost than Veo 3.1.
-
-          * `wan-2.2`: Best for physical motion, action, and camera movement.
-
-          * `wan-3.0`: High-quality video with native audio, long clips, and end-frame control.
-
-
-          If you specify the deprecated model value that includes the `-audio` suffix, this will be the same as
-          included `audio` as `true`.'
+        description: The video generation model. With `default`, paid tiers use `kling-3.0` and Free uses
+          `ltx-2.5`. Duration, resolution, audio and reference support depend on the selected model. Deprecated
+          model values ending in `-audio` enable `audio`.
         default: default
         example: ltx-2.5
       audio:
@@ -2326,9 +2099,20 @@ tools:
             file_path:
               minLength: 1
               type: string
+              description: 'This value is either
+
+                - a direct URL to the file. The URL path must end in a supported file extension.
+
+                - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
+
+
+                See the [file upload guide](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls#input-file)
+                for details.
+
+                '
               example: api-assets/id/1234.png
-        description: 'Reference media for video generation. Name references without @ and refer to them as @name
-          in style.prompt. Maximum 10 references total.
+        description: 'Reference media for video generation. Name references without @ and refer to them
+          as @name in style.prompt. Maximum 10 references total.
 
 
           Supported models and reference media:
@@ -2353,17 +2137,9 @@ tools:
     required:
     - end_seconds
     - style
-- name: video_to_video_create_video
-  description: "MCP guidance:\n- Starts an async video job; returns `id` and `credits_charged`. For finished results,\
-    \ call `wait_for_video_project` with that id or poll `GET /v1/video-projects/{id}` until `complete`, `error`,\
-    \ or `canceled`. Results include `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and\
-    \ query parameters; never append expiration metadata.\n- For `*_file_path`, use an existing Magic Hour path\
-    \ or the upload-URL endpoint's `file_path` after uploading raw bytes to its presigned URL. Direct public media\
-    \ URLs may work if stable and fetchable as raw bytes; hotlinked URLs can fail. Prefer the upload-URL endpoint\
-    \ when unsure.\n\n**What this API does**\n\nCreate the same Video To Video you can make in the browser, but\
-    \ programmatically, so you can automate it, run it at scale, or connect it to your own app or workflow.\n  \
-    \  \n**Good for**\n- Automation and batch processing  \n- Adding video to video into apps, pipelines, or tools\
-    \  \n\n**How it works (3 steps)**\n1) Upload your..."
+- name: restyle_video
+  description: Restyles an existing video clip with an art-style preset or a custom prompt. Supports v1/v2
+    presets, not v3. Starts a background job that costs credits; returns a project id for wait_for_video_project.
   input_schema:
     type: object
     properties:
@@ -2389,8 +2165,8 @@ tools:
         - FULL
         - HALF
         type: string
-        description: 'Determines whether the resulting video will have the same frame per second as the original
-          video, or half.
+        description: 'Determines whether the resulting video will have the same frame per second as the
+          original video, or half.
 
           * `FULL` - the result video will have the same FPS as the input video
 
@@ -2487,13 +2263,9 @@ tools:
             - v2
             - default
             type: string
-            description: '* `v1` - more detail, closer prompt adherence, and frame-by-frame previews.
-
-              * `v2` - faster, more consistent, and less noisy.
-
-              * `default` - use the selected art style''s default version. Some art styles default to v3, which
-              is unavailable through this API. For `Studio Ghibli`, explicitly set `version` to `v2` to use its
-              supported preset.'
+            description: Select restyling version `v1` or `v2`. `default` uses the selected art style's
+              default version. Some styles default to v3, which this API does not support. For `Studio
+              Ghibli`, explicitly set `version` to `v2` for its supported preset.
             default: default
             example: default
           prompt_type:
@@ -2502,20 +2274,18 @@ tools:
             - custom
             - append_default
             type: string
-            description: '* `default` - Use the default recommended prompt for the art style.
-
-              * `custom` - Only use the prompt passed in the API. Note: for v1, lora prompt will still be auto added
-              to apply the art style properly.
-
-              * `append_default` - Add the default recommended prompt to the end of the prompt passed in the API.'
+            description: '`default` uses the art style''s preset prompt and ignores `prompt`. `custom`
+              uses the supplied `prompt`; v1 still adds its LoRA prompt to apply the art style. `append_default`
+              appends the preset prompt to the supplied `prompt`.'
             default: default
             example: default
           prompt:
             type:
             - string
             - 'null'
-            description: The prompt used for the video. Prompt is required if `prompt_type` is `custom` or `append_default`.
-              If `prompt_type` is `default`, then the `prompt` value passed will be ignored.
+            description: The prompt used for the video. Prompt is required if `prompt_type` is `custom`
+              or `append_default`. If `prompt_type` is `default`, then the `prompt` value passed will
+              be ignored.
             example: A cinematic scene with warm lighting
           model:
             enum:
@@ -2528,14 +2298,8 @@ tools:
             - 3D Anime
             - default
             type: string
-            description: '* `Dreamshaper` - a good all-around model that works for both animations as well as realism.
-
-              * `Absolute Reality` - better at realism, but you''ll often get similar results with Dreamshaper as
-              well.
-
-              * `Flat 2D Anime` - best for a flat illustration style that''s common in most anime.
-
-              * `default` - use the default recommended model for the selected art style.'
+            description: Select a listed rendering model for the art style. `default` uses the selected
+              art style's default model.
             default: default
             example: default
       assets:
@@ -2554,7 +2318,7 @@ tools:
             type: string
             description: 'Your video file. Required if `video_source` is `file`. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2568,8 +2332,8 @@ tools:
             type: string
             description: YouTube URL (required if `video_source` is `youtube`).
             format: uri
-        description: Provide the assets for video-to-video. For video, The `video_source` field determines whether
-          `video_file_path` or `youtube_url` field is used
+        description: Provide the assets for video-to-video. For video, The `video_source` field determines
+          whether `video_file_path` or `youtube_url` field is used
         example:
           video_source: file
           video_file_path: api-assets/id/1234.mp4
@@ -2578,54 +2342,39 @@ tools:
     - end_seconds
     - style
     - assets
-- name: image_projects_retrieve_details
-  description: "MCP guidance:\n- Use this after a create tool to poll job status. When status is `complete`, surface\
-    \ the `downloads` URLs to the user; if status is `error`, surface the error message.\n- Each `downloads[n].url`\
-    \ is already the full signed download URL. Use it exactly as returned. Do not shorten it, strip query parameters,\
-    \ or append `expires_at` onto the URL string.\n\nCheck the progress of a image project. The `downloads` field\
-    \ is populated after a successful render.\n  \n**Statuses**\n- `queued` — waiting to start\n- `rendering` —\
-    \ in progress\n- `complete` — ready; see `downloads`\n- `error` — a failure occurred (see `error`)\n- `canceled`\
-    \ — user canceled\n- `draft` — not used"
+- name: get_image_project
+  description: Returns an image project's status and, once complete, its download URLs. Use to check progress
+    with the id from an image create tool. Read-only.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the image project. This value is returned by all of the POST APIs that create
-          an image.
+        description: Unique ID of the image project. This value is returned by all of the POST APIs that
+          create an image.
     required:
     - id
-- name: image_projects_delete
-  description: Permanently delete the rendered image(s). This action is not reversible, please be sure before deleting.
+- name: delete_image_project
+  description: Deletes the image project and attempts to delete its completed output. Cannot be undone;
+    confirm with the user first.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the image project. This value is returned by all of the POST APIs that create
-          an image.
+        description: Unique ID of the image project. This value is returned by all of the POST APIs that
+          create an image.
     required:
     - id
-- name: ai_clothes_changer_create_image
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: change_clothes_in_photo
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Change outfits in photos in seconds with just a photo reference. Each photo costs 25 credits.'
+    Changes clothing in a person photo using a supplied garment reference image. Costs 25 credits. Starts
+    a background job; returns a project id for wait_for_image_project.'
   input_schema:
     type: object
     properties:
@@ -2645,7 +2394,7 @@ tools:
             type: string
             description: 'The image with the person. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2660,7 +2409,7 @@ tools:
             type: string
             description: 'The image of the outfit. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2677,28 +2426,18 @@ tools:
             - lower_body
             - dresses
             type: string
-            description: "Type of clothing item to swap. If not provided, swaps the entire outfit. \n* `upper_body`\
-              \ - for shirts/jackets \n* `lower_body` - for pants/skirts \n* `dresses` - for entire outfit (deprecated,\
-              \ use `entire_outfit` instead) \n* `entire_outfit` - for entire outfit"
+            description: "Type of clothing item to swap. If not provided, swaps the entire outfit. \n\
+              * `upper_body` - for shirts/jackets \n* `lower_body` - for pants/skirts \n* `dresses` -\
+              \ for entire outfit (deprecated, use `entire_outfit` instead) \n* `entire_outfit` - for\
+              \ entire outfit"
             example: entire_outfit
         description: Provide the assets for clothes changer
     required:
     - assets
-- name: ai_face_editor_edit_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Edit facial features of an image using AI. Each edit costs 1 frame. The height/width of the output image depends
-    on your subscription. Please refer to our [pricing](https://magichour.ai/pricing) page for more details'
+- name: edit_face_in_photo
+  description: Adjusts facial expression, pose and gaze in a supplied photo using numeric controls. Costs
+    1 credit per edit; output size depends on the subscription tier. Starts a background job; returns
+    a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -2717,7 +2456,7 @@ tools:
             type: string
             description: 'This is the image whose face will be edited. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -2852,16 +2591,9 @@ tools:
     required:
     - assets
     - style
-- name: ai_gif_generator_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Create an AI GIF. Each GIF costs 50 credits.'
+- name: create_gif_or_short_video
+  description: Generates a short animation from a text prompt, with GIF, MP4 or WebM output. Costs 50
+    credits. Starts a background job; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -2892,24 +2624,10 @@ tools:
         example: gif
     required:
     - style
-- name: ai_image_editor_create_image
-  description: 'MCP guidance:
-
-    - Requires one or more source images in `assets.image_file_paths`. For prompt-only creation, use `ai_image_generator_create_image`
-    instead.
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Edit supplied images using `assets.image_file_paths` and `style.prompt`. For prompt-only creation use `ai_image_generator_create_image`.
-    Editing is not a required preparation step before image-to-video w...'
+- name: edit_image
+  description: Edits one or more supplied images using a text prompt. For prompt-only creation use generate_image.
+    Costs credits; returns a project id for wait_for_image_project. Model eligibility depends on the account
+    plan; the default model is not available on every plan.
   input_schema:
     type: object
     properties:
@@ -2946,32 +2664,34 @@ tools:
         - seedream-v4
         - nano-banana
         type: string
-        description: "The AI model to use for image editing. Each model has different capabilities and costs.\n\n\
-          **Models:**\n- `default` - Use the model we recommend, which will change over time. This is recommended\
-          \ unless you need a specific model. This is the default behavior.\n- `flux-2-klein` - from 5 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  -\
-          \ Max additional input images: 5\n- `gpt-image-2` - from 50 credits/image\n  - Supported resolutions:\
-          \ 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Max additional input images:\
-          \ 9\n- `gpt-image-2.5-flare` - from 100 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n\
-          \  - Available for tiers: creator, pro, business\n  - Max additional input images: 9\n- `krea-2` - from\
-          \ 10 credits/image\n  - Supported resolutions: 640px, 1k\n  - Available for tiers: free, creator, pro,\
-          \ business\n  - Max additional input images: 1\n- `nano-banana` - from 50 credits/image\n  - Supported\
-          \ resolutions: 640px, 1k\n  - Available for tiers: creator, pro, business\n  - Max additional input images:\
-          \ 9\n- `nano-banana-2` - from 100 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available\
-          \ for tiers: creator, pro, business\n  - Max additional input images: 9\n- `nano-banana-2-lite` - from\
-          \ 50 credits/image\n  - Supported resolutions: 640px, 1k\n  - Available for tiers: creator, pro, business\n\
-          \  - Max additional input images: 9\n- `nano-banana-2.1` - from 50 credits/image\n  - Supported resolutions:\
-          \ 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Max additional input images:\
-          \ 9\n- `nano-banana-pro` - from 150 credits/image\n  - Supported resolutions: 1k, 2k, 4k\n  - Available\
-          \ for tiers: creator, pro, business\n  - Max additional input images: 9\n- `qwen-edit` - from 10 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  -\
-          \ Max additional input images: 2\n- `qwen-image-2.1` - from 10 credits/image\n  - Supported resolutions:\
-          \ 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Max additional input images:\
-          \ 2\n- `seedream-v4` - from 40 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available\
-          \ for tiers: creator, pro, business\n  - Max additional input images: 9\n- `seedream-v4.5` - from 50 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Max\
-          \ additional input images: 9\n- `seedream-v5-pro` - from 75 credits/image\n  - Supported resolutions:\
-          \ 640px, 1k, 2k\n  - Available for tiers: creator, pro, business\n  - Max additional input images: 9\n"
+        description: "The AI model to use for image editing. Each model has different capabilities and\
+          \ costs.\n\n**Models:**\n- `default` - Uses the server-selected default model, which may change\
+          \ over time.\n- `flux-2-klein` - from 5 credits/image\n  - Supported resolutions: 640px, 1k,\
+          \ 2k\n  - Available for tiers: free, creator, pro, business\n  - Max additional input images:\
+          \ 5\n- `gpt-image-2` - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n\
+          \  - Available for tiers: creator, pro, business\n  - Max additional input images: 9\n- `gpt-image-2.5-flare`\
+          \ - from 100 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for\
+          \ tiers: creator, pro, business\n  - Max additional input images: 9\n- `krea-2` - from 10 credits/image\n\
+          \  - Supported resolutions: 640px, 1k\n  - Available for tiers: free, creator, pro, business\n\
+          \  - Max additional input images: 1\n- `nano-banana` - from 50 credits/image\n  - Supported\
+          \ resolutions: 640px, 1k\n  - Available for tiers: creator, pro, business\n  - Max additional\
+          \ input images: 9\n- `nano-banana-2` - from 100 credits/image\n  - Supported resolutions: 640px,\
+          \ 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Max additional input images:\
+          \ 9\n- `nano-banana-2-lite` - from 50 credits/image\n  - Supported resolutions: 640px, 1k\n\
+          \  - Available for tiers: creator, pro, business\n  - Max additional input images: 9\n- `nano-banana-2.1`\
+          \ - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers:\
+          \ creator, pro, business\n  - Max additional input images: 9\n- `nano-banana-pro` - from 150\
+          \ credits/image\n  - Supported resolutions: 1k, 2k, 4k\n  - Available for tiers: creator, pro,\
+          \ business\n  - Max additional input images: 9\n- `qwen-edit` - from 10 credits/image\n  - Supported\
+          \ resolutions: 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Max\
+          \ additional input images: 2\n- `qwen-image-2.1` - from 10 credits/image\n  - Supported resolutions:\
+          \ 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Max additional input\
+          \ images: 2\n- `seedream-v4` - from 40 credits/image\n  - Supported resolutions: 640px, 1k,\
+          \ 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Max additional input images:\
+          \ 9\n- `seedream-v4.5` - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n\
+          \  - Available for tiers: creator, pro, business\n  - Max additional input images: 9\n- `seedream-v5-pro`\
+          \ - from 75 credits/image\n  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers:\
+          \ creator, pro, business\n  - Max additional input images: 9\n"
         example: flux-2-klein
       aspect_ratio:
         enum:
@@ -3007,8 +2727,8 @@ tools:
 
           - `4k` — up to 4096px
 
-          - `auto` — **Deprecated.** Mapped server-side from your subscription tier to the best matching resolution
-          the model supports
+          - `auto` — **Deprecated.** Mapped server-side from your subscription tier to the best matching
+          resolution the model supports
 
 
           **Per-model support:**
@@ -3066,7 +2786,7 @@ tools:
               type: string
             description: 'The image(s) used in the edit, maximum of 10 images. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3082,20 +2802,9 @@ tools:
     required:
     - style
     - assets
-- name: ai_headshot_generator_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Create an AI headshot. Each headshot costs 50 credits.'
+- name: generate_headshot
+  description: Creates a headshot from a supplied photo containing one detectable face, with optional
+    appearance instructions. Costs 50 credits. Starts a background job; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3109,8 +2818,8 @@ tools:
         properties:
           prompt:
             type: string
-            description: Prompt used to guide the style of your headshot. We recommend omitting the prompt unless
-              you want to customize your headshot. You can visit [AI headshot generator](https://magichour.ai/create/ai-headshot-generator)
+            description: Prompt used to guide the style of your headshot. We recommend omitting the prompt
+              unless you want to customize your headshot. You can visit [AI headshot generator](https://magichour.ai/create/ai-headshot-generator)
               to view an example of a good prompt used for our 'Professional' style.
             example: Professional studio headshot with soft lighting and a neutral background
       assets:
@@ -3121,10 +2830,10 @@ tools:
           image_file_path:
             minLength: 1
             type: string
-            description: 'The image used to generate the headshot. This image must contain one detectable face.
-              This value is either
+            description: 'The image used to generate the headshot. This image must contain one detectable
+              face. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3137,16 +2846,9 @@ tools:
         description: Provide the assets for headshot photo
     required:
     - assets
-- name: ai_image_generator_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Create an AI image with advanced model selection and quality controls.'
+- name: generate_image
+  description: Generates one or more images from a text prompt, with model, output size and image count
+    options. Costs credits; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3180,32 +2882,34 @@ tools:
         - flux-schnell
         - seedream
         type: string
-        description: "The AI model to use for image generation. Each model has different capabilities and costs.\n\
-          \n**Models:**\n- `default` - Use the model we recommend, which will change over time. This is recommended\
-          \ unless you need a specific model. This is the default behavior.\n- `flux-2-klein` - from 5 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  -\
-          \ Image count allowed: 1\n- `flux-schnell` - from 5 credits/image\n  - Supported resolutions: 640px, 1k,\
-          \ 2k\n  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `gpt-image-2`\
-          \ - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator,\
-          \ pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `gpt-image-2.5-flare` - from 100 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Image\
-          \ count allowed: 1, 2, 3, 4\n- `krea-2` - from 10 credits/image\n  - Supported resolutions: 640px, 1k\n\
-          \  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1\n- `nano-banana` -\
-          \ from 50 credits/image\n  - Supported resolutions: 640px, 1k\n  - Available for tiers: creator, pro,\
-          \ business\n  - Image count allowed: 1, 2, 3, 4\n- `nano-banana-2` - from 100 credits/image\n  - Supported\
-          \ resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Image count allowed:\
-          \ 1, 4, 9, 16\n- `nano-banana-2-lite` - from 50 credits/image\n  - Supported resolutions: 640px, 1k\n\
-          \  - Available for tiers: creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `nano-banana-2.1`\
-          \ - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator,\
-          \ pro, business\n  - Image count allowed: 1, 4, 9, 16\n- `nano-banana-pro` - from 150 credits/image\n\
-          \  - Supported resolutions: 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Image count\
-          \ allowed: 1, 4, 9, 16\n- `qwen-image-2.1` - from 10 credits/image\n  - Supported resolutions: 640px,\
-          \ 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n\
-          - `seedream-v4` - from 40 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for\
-          \ tiers: creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `seedream-v5-pro` - from 75 credits/image\n\
-          \  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers: creator, pro, business\n  - Image\
-          \ count allowed: 1, 2, 3, 4\n- `z-image-turbo` - from 5 credits/image\n  - Supported resolutions: 640px,\
-          \ 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n\
+        description: "The AI model to use for image generation. Each model has different capabilities\
+          \ and costs.\n\n**Models:**\n- `default` - Uses the server-selected default model, which may\
+          \ change over time.\n- `flux-2-klein` - from 5 credits/image\n  - Supported resolutions: 640px,\
+          \ 1k, 2k\n  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1\n\
+          - `flux-schnell` - from 5 credits/image\n  - Supported resolutions: 640px, 1k, 2k\n  - Available\
+          \ for tiers: free, creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `gpt-image-2`\
+          \ - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers:\
+          \ creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `gpt-image-2.5-flare` - from\
+          \ 100 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers:\
+          \ creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `krea-2` - from 10 credits/image\n\
+          \  - Supported resolutions: 640px, 1k\n  - Available for tiers: free, creator, pro, business\n\
+          \  - Image count allowed: 1\n- `nano-banana` - from 50 credits/image\n  - Supported resolutions:\
+          \ 640px, 1k\n  - Available for tiers: creator, pro, business\n  - Image count allowed: 1, 2,\
+          \ 3, 4\n- `nano-banana-2` - from 100 credits/image\n  - Supported resolutions: 640px, 1k, 2k,\
+          \ 4k\n  - Available for tiers: creator, pro, business\n  - Image count allowed: 1, 4, 9, 16\n\
+          - `nano-banana-2-lite` - from 50 credits/image\n  - Supported resolutions: 640px, 1k\n  - Available\
+          \ for tiers: creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n- `nano-banana-2.1`\
+          \ - from 50 credits/image\n  - Supported resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers:\
+          \ creator, pro, business\n  - Image count allowed: 1, 4, 9, 16\n- `nano-banana-pro` - from 150\
+          \ credits/image\n  - Supported resolutions: 1k, 2k, 4k\n  - Available for tiers: creator, pro,\
+          \ business\n  - Image count allowed: 1, 4, 9, 16\n- `qwen-image-2.1` - from 10 credits/image\n\
+          \  - Supported resolutions: 640px, 1k, 2k\n  - Available for tiers: free, creator, pro, business\n\
+          \  - Image count allowed: 1, 2, 3, 4\n- `seedream-v4` - from 40 credits/image\n  - Supported\
+          \ resolutions: 640px, 1k, 2k, 4k\n  - Available for tiers: creator, pro, business\n  - Image\
+          \ count allowed: 1, 2, 3, 4\n- `seedream-v5-pro` - from 75 credits/image\n  - Supported resolutions:\
+          \ 640px, 1k, 2k\n  - Available for tiers: creator, pro, business\n  - Image count allowed: 1,\
+          \ 2, 3, 4\n- `z-image-turbo` - from 5 credits/image\n  - Supported resolutions: 640px, 1k, 2k\n\
+          \  - Available for tiers: free, creator, pro, business\n  - Image count allowed: 1, 2, 3, 4\n\
           \n**Deprecated Enum Values:**\n- `seedream` - Use `seedream-v4` instead.\n"
         example: z-image-turbo
       aspect_ratio:
@@ -3237,8 +2941,8 @@ tools:
 
           - `4k` — up to 4096px
 
-          - `auto` — **Deprecated.** Mapped server-side from your subscription tier to the best matching resolution
-          the model supports
+          - `auto` — **Deprecated.** Mapped server-side from your subscription tier to the best matching
+          resolution the model supports
 
 
           **Per-model support:**
@@ -3330,21 +3034,9 @@ tools:
     required:
     - image_count
     - style
-- name: ai_image_upscaler_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Upscale your image using AI. Each 2x upscale costs 50 credits for balanced/creative modes, and 25 credits for
-    preserve. 4x upscale costs 200 and 100 credits respectively.'
+- name: upscale_image
+  description: Upscales a supplied image 2x or 4x. Cost depends on scale and mode (25-200 credits); returns
+    a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3355,8 +3047,8 @@ tools:
         example: My Image Upscaler image
       scale_factor:
         type: number
-        description: "How much to scale the image. Must be either 2 or 4.\n            \nNote: 4x upscale is only\
-          \ available on Creator, Pro, or Business tier."
+        description: "How much to scale the image. Must be either 2 or 4.\n            \nNote: 4x upscale\
+          \ is only available on Creator, Pro, or Business tier."
         example: 2
       style:
         type: object
@@ -3368,16 +3060,16 @@ tools:
             - balanced
             - creative
             type: string
-            description: The upscaling mode. `"preserve"` uses the fast pro pipeline (1× credit multiplier). `"balanced"`
-              and `"creative"` use the creative pipeline (2× credit multiplier). `"pro"` is deprecated and maps
-              to `"preserve"`. Defaults to `"balanced"`.
+            description: The upscaling mode. `"preserve"` uses the fast pro pipeline (1× credit multiplier).
+              `"balanced"` and `"creative"` use the creative pipeline (2× credit multiplier). `"pro"`
+              is deprecated and maps to `"preserve"`. Defaults to `"balanced"`.
             example: preserve
           prompt:
             type: string
             description: A prompt to guide the final image. Only used when mode is `creative`.
             example: Enhance fine details and keep the image natural
-        description: Style settings for the upscale. Use `mode` (`"preserve"`, `"balanced"`, or `"creative"`). Defaults
-          to `"balanced"`.
+        description: Style settings for the upscale. Use `mode` (`"preserve"`, `"balanced"`, or `"creative"`).
+          Defaults to `"balanced"`.
         default: {}
         example:
           mode: preserve
@@ -3391,7 +3083,7 @@ tools:
             type: string
             description: 'The image to upscale. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3405,16 +3097,9 @@ tools:
     required:
     - scale_factor
     - assets
-- name: ai_meme_generator_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Create an AI generated meme. Each meme costs 10 credits.'
+- name: create_meme
+  description: Creates a meme from a topic and template selection. Costs 10 credits. Starts a background
+    job; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3446,16 +3131,9 @@ tools:
             example: false
     required:
     - style
-- name: ai_qr_code_generator_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Create an AI QR code. Each QR code costs 0 credits.'
+- name: create_qr_code
+  description: Creates a stylized QR code from supplied text or a URL and an art-style description. Currently
+    costs 0 credits. Starts a background job; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3475,32 +3153,20 @@ tools:
         properties:
           art_style:
             type: string
-            description: To use our templates, pass in one of Watercolor, Cyberpunk City, Ink Landscape, Interior
-              Painting, Japanese Street, Mech, Minecraft, Picasso Painting, Game Map, Spaceship, Chinese Painting,
-              Winter Village, or pass any custom art style.
+            description: To use our templates, pass in one of Watercolor, Cyberpunk City, Ink Landscape,
+              Interior Painting, Japanese Street, Mech, Minecraft, Picasso Painting, Game Map, Spaceship,
+              Chinese Painting, Winter Village, or pass any custom art style.
             example: Watercolor
     required:
     - content
     - style
-- name: body_swap_create_image
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: place_person_in_scene
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Swap a person into a scene image using Nano Banana 2 Lite (640px/1k) or Nano Banana 2 (2k/4k). Credits depend
-    on `resolution` (from 50 credits at 640px upward).'
+    Places a person from one supplied photo into a supplied scene image. Cost depends on resolution (from
+    50 credits at 640px); returns a project id for wait_for_image_project.'
   input_schema:
     type: object
     properties:
@@ -3529,7 +3195,7 @@ tools:
             type: string
             description: 'Image of the person to place into the scene. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3544,7 +3210,7 @@ tools:
             type: string
             description: 'Original scene image (background). This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3558,25 +3224,13 @@ tools:
     required:
     - resolution
     - assets
-- name: face_swap_photo_create_image
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: swap_face_in_photo
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Create a face swap photo. Each photo costs 10 credits. The height/width of the output image depends on your
-    subscription. Please refer to our [pricing](https://magichour.ai/pricin...'
+    Swaps faces in a supplied photo using a source face image or selected face mappings. Costs 10 credits;
+    output size depends on subscription. Returns a project id for wait_for_image_project.'
   input_schema:
     type: object
     properties:
@@ -3595,24 +3249,20 @@ tools:
             - all-faces
             - individual-faces
             type: string
-            description: 'Choose how to swap faces:
-
-              - **all-faces** (recommended) — swap all detected faces using one source image (`source_file_path`
-              required)
-
-              - **individual-faces** — specify exact mappings using `face_mappings`'
+            description: Choose which faces to swap. `all-faces` uses one source image for all detected
+              faces (`source_file_path` required). `individual-faces` uses exact `face_mappings`.
             default: all-faces
             example: all-faces
           source_file_path:
             minLength: 1
             type: string
-            description: 'This is the image from which the face is extracted. The value is required if `face_swap_mode`
-              is `all-faces`.
+            description: 'This is the image from which the face is extracted. The value is required if
+              `face_swap_mode` is `all-faces`.
 
 
               This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3633,23 +3283,23 @@ tools:
               properties:
                 original_face:
                   type: string
-                  description: 'The face detected from the image in `target_file_path`. The file name is in the
-                    format of `<face_frame>-<face_index>.png`. This value is corresponds to the response in the
-                    [face detection API](https://docs.magichour.ai/api-reference/files/get-face-detection-details).
+                  description: 'The face detected from the image in `target_file_path`. The file name
+                    is in the format of `<face_frame>-<face_index>.png`. This value is corresponds to
+                    the response in the [face detection API](https://docs.magichour.ai/api-reference/files/get-face-detection-details).
 
 
-                    * The face_frame is the frame number of the face in the target image. For images, the frame
-                    number is always 0.
+                    * The face_frame is the frame number of the face in the target image. For images,
+                    the frame number is always 0.
 
-                    * The face_index is the index of the face in the target image, starting from 0 going left to
-                    right.'
+                    * The face_index is the index of the face in the target image, starting from 0 going
+                    left to right.'
                   example: api-assets/id/0-0.png
                 new_face:
                   type: string
-                  description: 'The face image that will be used to replace the face in the `original_face`. This
-                    value is either
+                  description: 'The face image that will be used to replace the face in the `original_face`.
+                    This value is either
 
-                    - a direct URL to the video file
+                    - a direct URL to the file. The URL path must end in a supported file extension.
 
                     - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3659,17 +3309,18 @@ tools:
 
                     '
                   example: api-assets/id/1234.png
-            description: This is the array of face mappings used for multiple face swap. The value is required if
-              `face_swap_mode` is `individual-faces`.
+            description: This is the array of face mappings used for multiple face swap. The value is
+              required if `face_swap_mode` is `individual-faces`.
             example:
             - original_face: api-assets/id/0-0.png
               new_face: api-assets/id/1234.png
           target_file_path:
             minLength: 1
             type: string
-            description: 'This is the image where the face from the source image will be placed. This value is either
+            description: 'This is the image where the face from the source image will be placed. This
+              value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3686,25 +3337,13 @@ tools:
           target_file_path: api-assets/id/1234.png
     required:
     - assets
-- name: head_swap_create_image
-  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use for impersonation,
-    deception, sexual content, or content involving minors.
+- name: swap_head_in_photo
+  description: 'Use only with the user''s own likeness or content they are authorized to use. Do not use
+    for impersonation, deception, sexual content, or content involving minors.
 
 
-    MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Swap a head onto a body image. Each image costs 10 credits. Output resolution depends on your subscription;
-    you may set `max_resolution` lower than your plan maximum if desired.'
+    Swaps a head from a supplied image onto a supplied body image. Costs 10 credits; returns a project
+    id for wait_for_image_project.'
   input_schema:
     type: object
     properties:
@@ -3715,8 +3354,9 @@ tools:
         example: My Head Swap image
       max_resolution:
         type: integer
-        description: Constrains the larger dimension (height or width) of the output. Omit to use the maximum allowed
-          for your plan (capped at 2048px). Values above your plan maximum are clamped down to your plan's maximum.
+        description: Constrains the larger dimension (height or width) of the output. Omit to use the
+          maximum allowed for your plan (capped at 2048px). Values above your plan maximum are clamped
+          down to your plan's maximum.
         example: 1024
       assets:
         required:
@@ -3729,7 +3369,7 @@ tools:
             type: string
             description: 'Image that receives the swapped head. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3744,7 +3384,7 @@ tools:
             type: string
             description: 'Image of the head to place on the body. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3757,20 +3397,9 @@ tools:
         description: Provide the body and head images for head swap
     required:
     - assets
-- name: image_background_remover_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Remove background from image. Each image costs 5 credits.'
+- name: remove_image_background
+  description: Removes an image's background, optionally replacing it with another supplied image. Costs
+    5 credits. Starts a background job; returns a project id for wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3788,7 +3417,7 @@ tools:
             type: string
             description: 'The image to remove the background. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3800,13 +3429,14 @@ tools:
             example: api-assets/id/1234.png
           background_image_file_path:
             type: string
-            description: 'The image used as the new background for the image_file_path. This image will be resized
-              to match the image in image_file_path. Please make sure the resolution between the images are similar.
+            description: 'The image used as the new background for the image_file_path. This image will
+              be resized to match the image in image_file_path. Please make sure the resolution between
+              the images are similar.
 
 
               This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3819,20 +3449,9 @@ tools:
         description: Provide the assets for background removal
     required:
     - assets
-- name: photo_colorizer_create_image
-  description: 'MCP guidance:
-
-    - Starts an async image job; returns `id` and `credits_charged`. For finished results, call `wait_for_image_project`
-    with that id or poll `GET /v1/image-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-    - For `*_file_path`, use an existing Magic Hour path or the upload-URL endpoint''s `file_path` after uploading
-    raw bytes to its presigned URL. Direct public media URLs may work if stable and fetchable as raw bytes; hotlinked
-    URLs can fail. Prefer the upload-URL endpoint when unsure.
-
-
-    Colorize image. Each image costs 10 credits.'
+- name: colorize_photo
+  description: Colorizes a black-and-white or faded photo. Costs 10 credits; returns a project id for
+    wait_for_image_project.
   input_schema:
     type: object
     properties:
@@ -3851,7 +3470,7 @@ tools:
             type: string
             description: 'The image used to generate the colorized image. This value is either
 
-              - a direct URL to the video file
+              - a direct URL to the file. The URL path must end in a supported file extension.
 
               - `file_path` field from the response of the [upload urls API](https://docs.magichour.ai/api-reference/files/generate-asset-upload-urls).
 
@@ -3864,48 +3483,35 @@ tools:
         description: Provide the assets for photo colorization
     required:
     - assets
-- name: audio_projects_retrieve_details
-  description: "MCP guidance:\n- Use this after a create tool to poll job status. When status is `complete`, surface\
-    \ the `downloads` URLs to the user; if status is `error`, surface the error message.\n- Each `downloads[n].url`\
-    \ is already the full signed download URL. Use it exactly as returned. Do not shorten it, strip query parameters,\
-    \ or append `expires_at` onto the URL string.\n\nCheck the progress of a audio project. The `downloads` field\
-    \ is populated after a successful render.\n  \n**Statuses**\n- `queued` — waiting to start\n- `rendering` —\
-    \ in progress\n- `complete` — ready; see `downloads`\n- `error` — a failure occurred (see `error`)\n- `canceled`\
-    \ — user canceled\n- `draft` — not used"
+- name: get_audio_project
+  description: Returns an audio project's status and, once complete, its download URLs. Use to check progress
+    with the id from an audio create tool. Read-only.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the audio project. This value is returned by all of the POST APIs that create
-          an audio.
+        description: Unique ID of the audio project. This value is returned by all of the POST APIs that
+          create an audio.
     required:
     - id
-- name: audio_projects_delete
-  description: Permanently delete the rendered audio file(s). This action is not reversible, please be sure before
-    deleting.
+- name: delete_audio_project
+  description: Deletes the audio project and attempts to delete its completed output. Cannot be undone;
+    confirm with the user first.
   input_schema:
     type: object
     properties:
       id:
         type: string
         example: cuid-example
-        description: Unique ID of the audio project. This value is returned by all of the POST APIs that create
-          an audio.
+        description: Unique ID of the audio project. This value is returned by all of the POST APIs that
+          create an audio.
     required:
     - id
-- name: ai_music_generator_create_audio
-  description: 'MCP guidance:
-
-    - Starts an async audio job; returns `id` and `credits_charged`. For finished results, call `wait_for_audio_project`
-    with that id or poll `GET /v1/audio-projects/{id}` until `complete`, `error`, or `canceled`. Results include
-    `downloads`; wait helpers add `exact_download_urls`. Preserve signed URLs and query parameters; never append
-    expiration metadata.
-
-
-    Generate music from a description, with optional custom lyrics or instrumental-only output. Costs 1 credits
-    per requested second. Returns a project ID; poll GET /v1/audio-projects/{id} for status and downloads.'
+- name: generate_music
+  description: Generates music from a description, with optional custom lyrics or instrumental-only output.
+    Costs 1 credit per requested second; returns a project id for wait_for_audio_project.
   input_schema:
     type: object
     properties:
@@ -3937,7 +3543,8 @@ tools:
             example: false
           lyrics:
             type: string
-            description: Custom lyrics. Omit or leave blank for AI-generated lyrics when instrumental is false.
+            description: Custom lyrics. Omit or leave blank for AI-generated lyrics when instrumental
+              is false.
             example: City lights are fading...
         additionalProperties: false
     required:
