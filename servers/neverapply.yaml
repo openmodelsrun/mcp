@@ -1,0 +1,27 @@
+id: neverapply
+name: NeverApply
+description: >
+  NeverApply's hosted MCP server lets Claude, Cursor, Cline and other MCP clients
+  search and match jobs, tailor resumes, answer screening questions, prepare for
+  interviews, and apply to jobs with your approval. Remote Streamable HTTP endpoint
+  at https://neverapply.co/mcp with OAuth 2.1 sign-in (PKCE and dynamic client
+  registration), 15 tools. Docs: https://neverapply.co/features/mcp. The linked
+  repository holds the public connection config and client plugins, not the hosted
+  server implementation.
+author:
+  name: NeverApply
+  github: kasovy
+repository: https://github.com/kasovy/neverapply-mcp
+transport:
+  - http-streaming
+category: Productivity
+tags:
+  - jobs
+  - job-search
+  - resume
+  - career
+  - remote-mcp
+  - oauth
+created_at: "2026-11-01T13:15:00.000Z"
+updated_at: "2026-11-01T13:15:00.000Z"
+license: MIT
