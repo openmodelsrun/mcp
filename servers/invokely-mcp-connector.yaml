@@ -1,0 +1,156 @@
+id: invokely-mcp-connector
+name: Invokely MCP Connector
+description: >
+  Invokely exposes official statistics through a hosted MCP service. This entry
+  is for the MIT-licensed local stdio connector, which forwards MCP requests to
+  that service; its public repository does not contain the hosted backend. The
+  connector uses the trial endpoint without a key, limited to 25 calls per day
+  per IP, or an API key from INVOKELY_API_KEY. It can find indicators, resolve
+  places, return cited values and time series, compare places, and rank places.
+  Returned figures include their period, unit, publisher, source link, and
+  citation.
+author:
+  name: Esteve Castells
+  github: estevecastells
+repository: https://github.com/estevecastells/invokely-mcp-connector
+transport:
+  - stdio
+category: Research
+tags:
+  - official-statistics
+  - public-data
+  - statistics
+  - data-api
+  - mcp-connector
+created_at: "2026-10-12T00:00:00.000Z"
+updated_at: "2026-10-12T00:00:00.000Z"
+tools:
+  - name: search_indicators
+    description: Search official statistical indicators by name or topic, optionally for a place.
+    input_schema:
+      type: object
+      properties:
+        query:
+          type: string
+        geography:
+          type: string
+      required:
+        - query
+  - name: resolve_place
+    description: Resolve a place name or id to its normalized entity, official codes, level, and parent.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+        country:
+          type: string
+          maxLength: 2
+        level:
+          type: string
+          enum: [municipality, province, region, country, supranational]
+      required:
+        - name
+  - name: get_value
+    description: Get one official figure for an indicator and place, with period and source citation.
+    input_schema:
+      type: object
+      properties:
+        indicator:
+          type: string
+        place:
+          type: string
+        period:
+          type: string
+          maxLength: 10
+        frequency:
+          type: string
+          enum: [year, half, quarter, month]
+        country:
+          type: string
+          maxLength: 2
+      required: [indicator, place]
+  - name: get_series
+    description: Get an indicator time series for one place, with periods and source information.
+    input_schema:
+      type: object
+      properties:
+        indicator:
+          type: string
+        place:
+          type: string
+        from:
+          type: string
+          maxLength: 10
+        to:
+          type: string
+          maxLength: 10
+        frequency:
+          type: string
+          enum: [year, half, quarter, month]
+        country:
+          type: string
+          maxLength: 2
+        include_projections:
+          type: boolean
+      required: [indicator, place]
+  - name: compare
+    description: Compare one indicator across two to ten places, using one shared source when possible.
+    input_schema:
+      type: object
+      properties:
+        indicator:
+          type: string
+        places:
+          type: array
+          minItems: 2
+          maxItems: 10
+          items:
+            type: string
+        period:
+          type: string
+          maxLength: 10
+        country:
+          type: string
+          maxLength: 2
+      required: [indicator, places]
+  - name: rank_places
+    description: Rank places within an area by an indicator, with the period and source provided.
+    input_schema:
+      type: object
+      properties:
+        indicator:
+          type: string
+        level:
+          type: string
+          enum: [country, region, province, municipality]
+        within:
+          type: string
+        period:
+          type: string
+          maxLength: 10
+        order:
+          type: string
+          enum: [desc, asc]
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        min_population:
+          type: integer
+          minimum: 0
+        country:
+          type: string
+          maxLength: 2
+      required: [indicator, level]
+install:
+  command: npx
+  args:
+    - "-y"
+    - "github:estevecastells/invokely-mcp-connector"
+env_vars:
+  - name: INVOKELY_API_KEY
+    description: Optional bearer key for authenticated access to the hosted service; omitted for trial access.
+    required: false
+license: MIT
+version: "0.1.0"
