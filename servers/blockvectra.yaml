@@ -22,7 +22,7 @@ tags:
 - agent-tools
 - streamable-http
 created_at: '2026-10-15T12:02:03.051Z'
-updated_at: '2026-10-29T02:36:42.675Z'
+updated_at: '2026-11-05T11:45:14.454Z'
 install:
   url: https://docs.blockvectra.com/mcp
 tools:
@@ -97,14 +97,16 @@ tools:
     required:
     - query
 - name: list_chains
-  description: 'Fetch supported blockchain networks and static parameters from `GET /v1/chains`. `methods.allow`
-    and `methods.deny` support wildcard patterns where `deny` takes precedence over `allow`. `state_window_blocks`
-    indicates the historical state window in blocks for state queries (null when full history is available);
-    `max_logs_block_range` limits `eth_getLogs`: the range is inclusive, so `toBlock - fromBlock + 1`
-    must not exceed it, otherwise the call fails with `logs_range_too_large`. `public` describes the keyless
-    endpoint: `public.url` serves only the methods in `public.methods`, and `public.history_blocks` is
-    how far back a block reference may reach on that endpoint (it does not add methods). Pass `chain`
-    (a slug such as `base_mainnet`) to return only that chain.'
+  description: >-
+    Fetch chain capabilities from GET /v1/chains. methods.allow and methods.deny support
+    wildcards; deny wins. max_logs_block_range is the keyed/general inclusive eth_getLogs limit
+    (toBlock - fromBlock + 1); state_window_blocks is the historical state window, null for full
+    history. Keyless access uses public.url and only public.methods. public.history_blocks is a
+    separate historical block-reference limit and does not enable methods. Optional public.logs
+    applies only when public.methods includes eth_getLogs; its address, block range, result count,
+    response bytes, batch and blockHash limits are separate from the general rate, history and
+    state policies. Missing public.logs does not mean unlimited access. Pass chain to filter by
+    exact slug; omit it to list all chains.
   input_schema:
     type: object
     properties:
@@ -194,11 +196,14 @@ tools:
         description: Response language (case-insensitive). Defaults to 'en'.
     additionalProperties: false
 - name: get_method_info
-  description: Inspect a single method's chain-by-chain availability, Compute Unit (CU) weight, price
-    per million calls, and documentation link. Check JSON-RPC method policy and Data API dataset coverage
-    separately. JSON-RPC follows methods.allow and methods.deny from /v1/chains. Data API coverage follows
-    data_features in GET /v1/status, with data enabled in /v1/chains. Pricing comes from /v1/plans. For
-    the full system-wide pricing schedule and rate card, use get_pricing instead. For calculating projected
+  description: >-
+    Inspect a single method's chain-by-chain availability, Compute Unit (CU) weight, price per
+    million calls, and documentation link. Check JSON-RPC method policy and Data API dataset
+    coverage separately. JSON-RPC follows methods.allow and methods.deny from /v1/chains;
+    'supported' means the service supports the method, not that the keyless public endpoint does
+    (see notes and public.methods in list_chains). Data API coverage follows data_features in GET
+    /v1/status, with data enabled in /v1/chains. Pricing comes from /v1/plans. For the full
+    system-wide pricing schedule and rate card, use get_pricing instead. For calculating projected
     bills for expected call volumes across methods, use estimate_usage instead.
   input_schema:
     type: object
